@@ -1,7 +1,11 @@
 package com.company;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class MainPanel extends JPanel {
 
@@ -13,9 +17,9 @@ public class MainPanel extends JPanel {
     private boolean stop;
 
     public MainPanel() {
-        map=new Map(100,100);
+        map=new Map(getWidthFromPanel(),getHeightFromPanel());
         stop=true;
-        genereate=new GenereatingThread(1000,map,this);
+        genereate=new GenereatingThread(getLimitFromPanel(),map,this);
 
         this.setPreferredSize(new Dimension(Main.DRAW_SIZE+Main.CONTROL_SIZE,Main.DRAW_SIZE));
         this.setLayout(null);
@@ -25,13 +29,25 @@ public class MainPanel extends JPanel {
         this.add(con);
     }
 
+    public boolean isStop() {
+        return stop;
+    }
+
+    private int getHeightFromPanel(){
+        return 100;
+    }
+
+    private int getWidthFromPanel(){
+        return 100;
+    }
+
+    private int getLimitFromPanel(){
+        return 1000;
+    }
+
     public void resetScreen(){
         this.repaint();
         this.revalidate();
-    }
-
-    public boolean isStop() {
-        return stop;
     }
 
     public synchronized void continueMode(JButton stopButton,JButton nextButton,JButton startButton,JButton restartButton){
@@ -41,7 +57,7 @@ public class MainPanel extends JPanel {
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
             genereate.ping();
-        }else{
+        }else if(!genereate.getState().equals(Thread.State.TERMINATED)){
             this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
@@ -49,16 +65,14 @@ public class MainPanel extends JPanel {
             restartButton.setEnabled(true);
             genereate.start();
         }
-
     }
 
     public synchronized void restart(JButton stopButton,JButton nextButton,JButton startButton,JButton restartButton){
         stop=true;
-        //genereate.interrupt();
         genereate.stop();
 
-        this.map=new Map(100,100);
-        this.genereate=new GenereatingThread(1000,this.map,this);
+        this.map=new Map(getWidthFromPanel(),getHeightFromPanel());
+        this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
         resetScreen();
 
         stopButton.setEnabled(false);
@@ -78,6 +92,23 @@ public class MainPanel extends JPanel {
         genereate.ping();
     }
 
+    public synchronized void save() {
+        if(!genereate.isAlive()){
+            BufferedImage image=null;
+            try {
+                image = new Robot().createScreenCapture(dp.bounds());
+                ImageIO.write(image,"png",new File("mapka.png"));
+            }catch (AWTException e){
+
+            }catch(IOException e){
+
+            }
+        }
+        else{
+            System.err.println("Mapa nie została jeszcze wygenerowana!!!");
+        }
+    }
+
     private class ControlPanel extends JPanel {
 
         private JButton start;
@@ -85,8 +116,15 @@ public class MainPanel extends JPanel {
         private JButton next;
         private JButton restart;
 
+        private JButton save;
+
         public ControlPanel(){
             super();
+
+            int buttonWidth=Main.CONTROL_SIZE/2;
+            int buttonHeight=Main.DRAW_SIZE/20;
+            int buttonShift=buttonWidth/2;
+            int buttonSpacing=buttonHeight*3;
 
             this.setPreferredSize(new Dimension(Main.CONTROL_SIZE,Main.DRAW_SIZE));
             this.setBounds(Main.DRAW_SIZE,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
@@ -94,29 +132,34 @@ public class MainPanel extends JPanel {
             this.setLayout(null);
 
             start=new JButton("Start");
-            start.setBounds(50,100,100,25);
+            start.setBounds(buttonShift,buttonSpacing,buttonWidth,buttonHeight);
             start.addActionListener(e->{continueMode(stop,next,start,restart);});
 
             stop=new JButton("Stop");
             stop.setEnabled(false);
-            stop.setBounds(50,200,100,25);
+            stop.setBounds(buttonShift,2*buttonSpacing,buttonWidth,buttonHeight);
             stop.addActionListener(e->{stop(stop,next,start);});
 
             next=new JButton("Next");
             next.setEnabled(false);
-            next.setBounds(50,300,100,25);
+            next.setBounds(buttonShift,3*buttonSpacing,buttonWidth,buttonHeight);
             next.addActionListener(e->{next();});
 
-            restart=new JButton("restart");
+            restart=new JButton("Restart");
             //restart.setEnabled(false);
-            restart.setBounds(50,400,100,25);
+            restart.setBounds(buttonShift,4*buttonSpacing,buttonWidth,buttonHeight);
             restart.addActionListener(e->{
                 restart(stop,next,start,restart);});
+
+            save=new JButton("Save");
+            save.setBounds(buttonShift,5*buttonSpacing,buttonWidth,buttonHeight);
+            save.addActionListener(e->{save();});
 
             this.add(start);
             this.add(stop);
             this.add(next);
             this.add(restart);
+            this.add(save);
         }
     }
 
