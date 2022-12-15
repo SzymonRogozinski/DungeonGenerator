@@ -3,7 +3,6 @@ package com.company;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,7 +16,6 @@ public class MainPanel extends JPanel {
     private boolean stop;
 
     public MainPanel() {
-        map=new Map(getWidthFromPanel(),getHeightFromPanel());
         stop=true;
         genereate=new GenereatingThread(getLimitFromPanel(),map,this);
 
@@ -33,12 +31,13 @@ public class MainPanel extends JPanel {
         return stop;
     }
 
-    private int getHeightFromPanel(){
-        return 100;
-    }
-
-    private int getWidthFromPanel(){
-        return 100;
+    private int getSizeFromPanel(){
+        try{
+            return Integer.parseInt(con.size_of_dungeon.getText());
+        }catch(NumberFormatException e){
+            System.err.println(con.size_of_dungeon.getText()+" is not a number!");
+        }
+        return 0;
     }
 
     private int getLimitFromPanel(){
@@ -57,7 +56,9 @@ public class MainPanel extends JPanel {
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
             genereate.ping();
-        }else if(!genereate.getState().equals(Thread.State.TERMINATED)){
+        }else{
+            this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
+            this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
             this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
@@ -71,8 +72,7 @@ public class MainPanel extends JPanel {
         stop=true;
         genereate.stop();
 
-        this.map=new Map(getWidthFromPanel(),getHeightFromPanel());
-        this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
+        this.map=null;
         resetScreen();
 
         stopButton.setEnabled(false);
@@ -94,15 +94,9 @@ public class MainPanel extends JPanel {
 
     public synchronized void save() {
         if(!genereate.isAlive()){
-            BufferedImage image=null;
             try {
-                image = new Robot().createScreenCapture(dp.bounds());
-                ImageIO.write(image,"png",new File("mapka.png"));
-            }catch (AWTException e){
-
-            }catch(IOException e){
-
-            }
+                ImageIO.write(map.getImage(), "png", new File("mapka.png"));
+            }catch (IOException ignore){}
         }
         else{
             System.err.println("Mapa nie została jeszcze wygenerowana!!!");
@@ -115,8 +109,8 @@ public class MainPanel extends JPanel {
         private JButton stop;
         private JButton next;
         private JButton restart;
-
         private JButton save;
+        private JTextField size_of_dungeon;
 
         public ControlPanel(){
             super();
@@ -124,7 +118,7 @@ public class MainPanel extends JPanel {
             int buttonWidth=Main.CONTROL_SIZE/2;
             int buttonHeight=Main.DRAW_SIZE/20;
             int buttonShift=buttonWidth/2;
-            int buttonSpacing=buttonHeight*3;
+            int buttonSpacing=buttonHeight*2;
 
             this.setPreferredSize(new Dimension(Main.CONTROL_SIZE,Main.DRAW_SIZE));
             this.setBounds(Main.DRAW_SIZE,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
@@ -146,7 +140,6 @@ public class MainPanel extends JPanel {
             next.addActionListener(e->{next();});
 
             restart=new JButton("Restart");
-            //restart.setEnabled(false);
             restart.setBounds(buttonShift,4*buttonSpacing,buttonWidth,buttonHeight);
             restart.addActionListener(e->{
                 restart(stop,next,start,restart);});
@@ -155,16 +148,19 @@ public class MainPanel extends JPanel {
             save.setBounds(buttonShift,5*buttonSpacing,buttonWidth,buttonHeight);
             save.addActionListener(e->{save();});
 
+            size_of_dungeon=new JTextField("100");
+            size_of_dungeon.setBounds(buttonShift,6*buttonSpacing,buttonWidth,buttonHeight);
+
             this.add(start);
             this.add(stop);
             this.add(next);
             this.add(restart);
             this.add(save);
+            this.add(size_of_dungeon);
         }
     }
 
     private class DungeonPanel extends JPanel {
-
 
         public DungeonPanel(){
             super();
@@ -174,18 +170,25 @@ public class MainPanel extends JPanel {
 
         @Override
         public void paint(Graphics g){
+            if(map==null){
+                g.setColor(Color.BLACK);
+                g.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
+                return;
+            }
             int scaleX=Main.DRAW_SIZE/map.getWidth();
             int scaleY=Main.DRAW_SIZE/map.getHeight();
-            Graphics2D gd=(Graphics2D) g;
-            gd.setColor(Color.BLACK);
-            gd.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
-            gd.setColor(Color.WHITE);
+            Graphics2D mapGraphics=map.getImage().createGraphics();
+            mapGraphics.setColor(Color.BLACK);
+            mapGraphics.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
+            mapGraphics.setColor(Color.WHITE);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
                     if(map.getTerrain(j,i))
-                        gd.fillRect(j*scaleX,i*scaleY,scaleX,scaleY);
+                        mapGraphics.fillRect(j*scaleX,i*scaleY,scaleX,scaleY);
                 }
             }
+            mapGraphics.dispose();
+            g.drawImage(map.getImage(),0,0,null);
         }
     }
 }

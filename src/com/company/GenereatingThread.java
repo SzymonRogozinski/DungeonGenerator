@@ -7,10 +7,8 @@ import java.util.Stack;
 public class GenereatingThread extends Thread{
 
     private int limit;
-
     private final double dense;
     private static final double DEFAULT_DENSE = 0.3;
-
     private static final int DEFAULT_DELAY = 100;
     private Map reference;
     private Random random;
