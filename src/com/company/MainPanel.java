@@ -17,7 +17,6 @@ public class MainPanel extends JPanel {
 
     public MainPanel() {
         stop=true;
-        genereate=new GenereatingThread(getLimitFromPanel(),map,this);
 
         this.setPreferredSize(new Dimension(Main.DRAW_SIZE+Main.CONTROL_SIZE,Main.DRAW_SIZE));
         this.setLayout(null);
@@ -33,15 +32,20 @@ public class MainPanel extends JPanel {
 
     private int getSizeFromPanel(){
         try{
-            return Integer.parseInt(con.size_of_dungeon.getText());
+            return Integer.parseInt(con.size_of_map.getText());
         }catch(NumberFormatException e){
-            System.err.println(con.size_of_dungeon.getText()+" is not a number!");
+            System.err.println(con.size_of_map.getText()+" is not a number!");
         }
         return 0;
     }
 
     private int getLimitFromPanel(){
-        return 1000;
+        try{
+            return Integer.parseInt(con.numberOfElements.getText());
+        }catch(NumberFormatException e){
+            System.err.println(con.numberOfElements.getText()+" is not a number!");
+        }
+        return 0;
     }
 
     public void resetScreen(){
@@ -50,7 +54,7 @@ public class MainPanel extends JPanel {
     }
 
     public synchronized void continueMode(JButton stopButton,JButton nextButton,JButton startButton,JButton restartButton){
-        if(genereate.isAlive()) {
+        if(genereate!=null && genereate.isAlive()) {
             this.stop = false;
             nextButton.setEnabled(false);
             startButton.setEnabled(false);
@@ -110,7 +114,10 @@ public class MainPanel extends JPanel {
         private JButton next;
         private JButton restart;
         private JButton save;
-        private JTextField size_of_dungeon;
+        private final JTextField size_of_map;
+        private JLabel textOfSize;
+        private JTextField numberOfElements;
+        private JLabel textOfNumber;
 
         public ControlPanel(){
             super();
@@ -127,36 +134,54 @@ public class MainPanel extends JPanel {
 
             start=new JButton("Start");
             start.setBounds(buttonShift,buttonSpacing,buttonWidth,buttonHeight);
-            start.addActionListener(e->{continueMode(stop,next,start,restart);});
+            start.addActionListener(e->continueMode(stop,next,start,restart));
 
             stop=new JButton("Stop");
             stop.setEnabled(false);
             stop.setBounds(buttonShift,2*buttonSpacing,buttonWidth,buttonHeight);
-            stop.addActionListener(e->{stop(stop,next,start);});
+            stop.addActionListener(e->stop(stop,next,start));
 
             next=new JButton("Next");
             next.setEnabled(false);
             next.setBounds(buttonShift,3*buttonSpacing,buttonWidth,buttonHeight);
-            next.addActionListener(e->{next();});
+            next.addActionListener(e->next());
 
             restart=new JButton("Restart");
             restart.setBounds(buttonShift,4*buttonSpacing,buttonWidth,buttonHeight);
-            restart.addActionListener(e->{
-                restart(stop,next,start,restart);});
+            restart.addActionListener(e->restart(stop,next,start,restart));
 
             save=new JButton("Save");
             save.setBounds(buttonShift,5*buttonSpacing,buttonWidth,buttonHeight);
-            save.addActionListener(e->{save();});
+            save.addActionListener(e-> save());
 
-            size_of_dungeon=new JTextField("100");
-            size_of_dungeon.setBounds(buttonShift,6*buttonSpacing,buttonWidth,buttonHeight);
+            textOfSize=new JLabel("Size of map");
+            textOfSize.setBounds(buttonShift,(int)(5.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfSize.setHorizontalAlignment(JLabel.CENTER);
+            textOfSize.setForeground(Color.WHITE);
+
+            size_of_map =new JTextField("100");
+            size_of_map.setBounds(buttonShift,6*buttonSpacing,buttonWidth,buttonHeight);
+            size_of_map.setHorizontalAlignment(JTextField.CENTER);
+
+            textOfNumber=new JLabel("Size of dungeon");
+            textOfNumber.setBounds(buttonShift,(int)(6.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfNumber.setHorizontalAlignment(JLabel.CENTER);
+            textOfNumber.setForeground(Color.WHITE);
+
+            numberOfElements=new JTextField("1000");
+            numberOfElements.setBounds(buttonShift,7*buttonSpacing,buttonWidth,buttonHeight);
+            numberOfElements.setHorizontalAlignment(JTextField.CENTER);
 
             this.add(start);
             this.add(stop);
             this.add(next);
             this.add(restart);
             this.add(save);
-            this.add(size_of_dungeon);
+            this.add(textOfSize);
+            this.add(size_of_map);
+            this.add(textOfSize);
+            this.add(numberOfElements);
+            this.add(textOfNumber);
         }
     }
 
