@@ -7,6 +7,9 @@ import java.util.Stack;
 public class GenereatingThread extends Thread{
 
     private int limit;
+    private final double dense;
+    private static final double DEFAULT_DENSE = 0.3;
+    private static final int DEFAULT_DELAY = 100;
     private Map reference;
     private Random random;
     private MainPanel panel;
@@ -19,6 +22,7 @@ public class GenereatingThread extends Thread{
         this.reference=reference;
         this.random=new Random();
         this.panel=panel;
+        this.dense= DEFAULT_DENSE;
     }
 
     public GenereatingThread(int limit,Map reference,MainPanel panel,int seed) {
@@ -26,6 +30,7 @@ public class GenereatingThread extends Thread{
         this.reference=reference;
         this.random=new Random(seed);
         this.panel=panel;
+        this.dense= DEFAULT_DENSE;
     }
 
     public synchronized void ping(){
@@ -37,7 +42,7 @@ public class GenereatingThread extends Thread{
         //Inicjalizacja stosów
         stack=new Stack<>();
         //Dodanie pierwszego elementu
-        stack.add(new Pair(random.nextInt(0,reference.getWidth()),random.nextInt(0,reference.getHeight())));
+        stack.add(new Pair(random.nextInt(reference.getWidth()/3,2*reference.getWidth())/3,random.nextInt(reference.getHeight()/3,2*reference.getHeight()/3)));
         generating();
     }
 
@@ -56,12 +61,10 @@ public class GenereatingThread extends Thread{
                 ArrayList<Pair> neighbour = howManyNeighbour(stack.pop());
                 //Dorzucenie do nowego stosu
                 if(neighbour.size()==0){
-                }else if (neighbour.size() <3) {
+                }else if (neighbour.size() < 3 || random.nextDouble()>dense) {
                     newStack.add(neighbour.get(random.nextInt(neighbour.size())));
-                } else if(random.nextDouble()<0.2) {
+                } else {
                     newStack.add(neighbour.get(random.nextInt(neighbour.size())));
-                    newStack.add(neighbour.get(random.nextInt(neighbour.size())));
-                }else{
                     newStack.add(neighbour.get(random.nextInt(neighbour.size())));
                 }
             }
@@ -76,11 +79,13 @@ public class GenereatingThread extends Thread{
                 }
             }
             try {
-                sleep(100);
+                sleep(DEFAULT_DELAY);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }while (limit>0);
+        }while (limit>0 && !stack.empty());
+        if(limit>0)
+            System.err.println("Nie wygenerowano pełnego lochu!");
     }
 
 
@@ -103,6 +108,23 @@ public class GenereatingThread extends Thread{
             n.add(new Pair(p.getX(), p.getY() + 1));
         }
         return  n;
+    }
+
+    private class Pair {
+        private final int x,y;
+
+        public Pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
     }
 
 }
