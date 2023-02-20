@@ -48,6 +48,15 @@ public class MainPanel extends JPanel {
         return 0;
     }
 
+    private int getSeedFromPanel(){
+        try{
+            return Integer.parseInt(con.seed.getText());
+        }catch(NumberFormatException e){
+            System.err.println(con.seed.getText()+" is not a number!");
+        }
+        return 0;
+    }
+
     public void resetScreen(){
         this.repaint();
         this.revalidate();
@@ -62,7 +71,11 @@ public class MainPanel extends JPanel {
             genereate.ping();
         }else{
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
-            this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
+            int seed=getSeedFromPanel();
+            if(seed==0)
+                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
+            else
+                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,seed);
             this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
@@ -118,6 +131,8 @@ public class MainPanel extends JPanel {
         private JLabel textOfSize;
         private JTextField numberOfElements;
         private JLabel textOfNumber;
+        private JTextField seed;
+        private JLabel textOfSeed;
 
         public ControlPanel(){
             super();
@@ -172,6 +187,15 @@ public class MainPanel extends JPanel {
             numberOfElements.setBounds(buttonShift,7*buttonSpacing,buttonWidth,buttonHeight);
             numberOfElements.setHorizontalAlignment(JTextField.CENTER);
 
+            textOfSeed=new JLabel("Seed");
+            textOfSeed.setBounds(buttonShift,(int)(7.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfSeed.setHorizontalAlignment(JLabel.CENTER);
+            textOfSeed.setForeground(Color.WHITE);
+
+            seed=new JTextField();
+            seed.setBounds(buttonShift,8*buttonSpacing,buttonWidth,buttonHeight);
+            seed.setHorizontalAlignment(JTextField.CENTER);
+
             this.add(start);
             this.add(stop);
             this.add(next);
@@ -182,6 +206,8 @@ public class MainPanel extends JPanel {
             this.add(textOfSize);
             this.add(numberOfElements);
             this.add(textOfNumber);
+            this.add(textOfSeed);
+            this.add(seed);
         }
     }
 

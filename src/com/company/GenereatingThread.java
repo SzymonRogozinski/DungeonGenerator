@@ -13,8 +13,8 @@ public class GenereatingThread extends Thread{
     private Map reference;
     private Random random;
     private MainPanel panel;
-    private Stack<Pair> stack;
-    private Stack<Pair> newStack;
+    private Stack<Ant> stack;
+    private Stack<Ant> newStack;
 
 
     public GenereatingThread(int limit,Map reference,MainPanel panel) {
@@ -42,7 +42,7 @@ public class GenereatingThread extends Thread{
         //Inicjalizacja stosów
         stack=new Stack<>();
         //Dodanie pierwszego elementu
-        stack.add(new Pair(random.nextInt(reference.getWidth()/3,2*reference.getWidth())/3,random.nextInt(reference.getHeight()/3,2*reference.getHeight()/3)));
+        stack.add(new Ant(random.nextInt(reference.getWidth()/3,2*reference.getWidth())/3,random.nextInt(reference.getHeight()/3,2*reference.getHeight()/3)));
         generating();
     }
 
@@ -58,7 +58,7 @@ public class GenereatingThread extends Thread{
                 }
                 limit--;
                 //Sprawdzenie ile sąsiadów
-                ArrayList<Pair> neighbour = howManyNeighbour(stack.pop());
+                ArrayList<Ant> neighbour = howManyNeighbour(stack.pop());
                 //Dorzucenie do nowego stosu
                 if(neighbour.size()==0){
                 }else if (neighbour.size() < 3 || random.nextDouble()>dense) {
@@ -89,42 +89,25 @@ public class GenereatingThread extends Thread{
     }
 
 
-    private ArrayList<Pair> howManyNeighbour(Pair p){
-        ArrayList<Pair> n=new ArrayList<>();
+    private ArrayList<Ant> howManyNeighbour(Ant p){
+        ArrayList<Ant> n=new ArrayList<>();
         //Góra
         if(p.getY()>0 && !reference.getTerrain(p.getX(),p.getY()-1)){
-            n.add(new Pair(p.getX(),p.getY()-1));
+            n.add(new Ant(p.getX(),p.getY()-1));
         }
         //Lewo
         if(p.getX()>0 && !reference.getTerrain(p.getX()-1,p.getY())){
-            n.add(new Pair(p.getX()-1,p.getY()));
+            n.add(new Ant(p.getX()-1,p.getY()));
         }
         //Prawo
         if(p.getX()<reference.getWidth()-1 && !reference.getTerrain(p.getX()+1,p.getY())){
-            n.add(new Pair(p.getX()+1,p.getY()));
+            n.add(new Ant(p.getX()+1,p.getY()));
         }
         //Dół
         if(p.getY()< reference.getHeight()-1 && !reference.getTerrain(p.getX(),p.getY()+1)) {
-            n.add(new Pair(p.getX(), p.getY() + 1));
+            n.add(new Ant(p.getX(), p.getY() + 1));
         }
         return  n;
-    }
-
-    private class Pair {
-        private final int x,y;
-
-        public Pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
     }
 
 }
