@@ -12,7 +12,7 @@ public class Map {
         this.width = width;
         this.height = height;
         terrain=new boolean[height][width];
-        image=new BufferedImage(Main.DRAW_SIZE,Main.DRAW_SIZE,BufferedImage.TYPE_BYTE_BINARY);
+        image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 
     public int getHeight() {

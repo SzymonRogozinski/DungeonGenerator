@@ -3,6 +3,7 @@ package com.company;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -112,7 +113,14 @@ public class MainPanel extends JPanel {
     public synchronized void save() {
         if(!genereate.isAlive()){
             try {
-                ImageIO.write(map.getImage(), "png", new File("mapka.png"));
+                //Przeskalowanie
+                Image tmp = map.getImage().getScaledInstance(Main.DRAW_SIZE, Main.DRAW_SIZE, Image.SCALE_SMOOTH);
+                BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_BYTE_BINARY);
+                Graphics2D g2d = dimg.createGraphics();
+                g2d.drawImage(tmp, 0, 0, null);
+                g2d.dispose();
+                //Zapis
+                ImageIO.write(dimg, "png", new File("mapka.png"));
             }catch (IOException ignore){}
         }
         else{
@@ -226,20 +234,18 @@ public class MainPanel extends JPanel {
                 g.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
                 return;
             }
-            int scaleX=Main.DRAW_SIZE/map.getWidth();
-            int scaleY=Main.DRAW_SIZE/map.getHeight();
             Graphics2D mapGraphics=map.getImage().createGraphics();
             mapGraphics.setColor(Color.BLACK);
-            mapGraphics.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
+            mapGraphics.fillRect(0,0,map.getWidth(),map.getHeight());
             mapGraphics.setColor(Color.WHITE);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
                     if(map.getTerrain(j,i))
-                        mapGraphics.fillRect(j*scaleX,i*scaleY,scaleX,scaleY);
+                        mapGraphics.fillRect(j,i,1,1);
                 }
             }
             mapGraphics.dispose();
-            g.drawImage(map.getImage(),0,0,null);
+            g.drawImage(map.getImage(),0,0,Main.DRAW_SIZE,Main.DRAW_SIZE,null);
         }
     }
 }
