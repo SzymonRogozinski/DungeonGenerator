@@ -145,63 +145,66 @@ public class MainPanel extends JPanel {
         public ControlPanel(){
             super();
 
-            int buttonWidth=Main.CONTROL_SIZE/2;
-            int buttonHeight=Main.DRAW_SIZE/20;
-            int buttonShift=buttonWidth/2;
-            int buttonSpacing=buttonHeight*2;
+            int textfieldWidth=Main.CONTROL_SIZE/2;
+            int textfieldHeight=Main.DRAW_SIZE/20;
+            int textfieldShift=textfieldWidth/2;
+            int textfieldSpacing=textfieldHeight*2;
+
+            int buttonSize=50;
+            int buttonShift=buttonSize/2;
 
             this.setPreferredSize(new Dimension(Main.CONTROL_SIZE,Main.DRAW_SIZE));
             this.setBounds(Main.DRAW_SIZE,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
             this.setBackground(Color.RED);
             this.setLayout(null);
 
-            start=new JButton("Start");
-            start.setBounds(buttonShift,buttonSpacing,buttonWidth,buttonHeight);
+            start=new JButton(new ImageIcon("Menu_Buttons/play-button.png"));
+            start.setBounds(buttonShift,buttonShift,buttonSize,buttonSize);
             start.addActionListener(e->continueMode(stop,next,start,restart));
 
-            stop=new JButton("Stop");
+            stop=new JButton(new ImageIcon("Menu_Buttons/pause-button.png"));
             stop.setEnabled(false);
-            stop.setBounds(buttonShift,2*buttonSpacing,buttonWidth,buttonHeight);
+            stop.setBounds(buttonSize+buttonShift,buttonShift,buttonSize,buttonSize);
             stop.addActionListener(e->stop(stop,next,start));
 
-            next=new JButton("Next");
+            next=new JButton(new ImageIcon("Menu_Buttons/next-button.png"));
             next.setEnabled(false);
-            next.setBounds(buttonShift,3*buttonSpacing,buttonWidth,buttonHeight);
+            next.setBounds(buttonSize*2+buttonShift,buttonShift,buttonSize,buttonSize);
             next.addActionListener(e->next());
 
-            restart=new JButton("Restart");
-            restart.setBounds(buttonShift,4*buttonSpacing,buttonWidth,buttonHeight);
+            restart=new JButton(new ImageIcon("Menu_Buttons/clockwise-rotation.png"));
+            restart.setBounds(buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             restart.addActionListener(e->restart(stop,next,start,restart));
 
-            save=new JButton("Save");
-            save.setBounds(buttonShift,5*buttonSpacing,buttonWidth,buttonHeight);
+            save=new JButton(new ImageIcon("Menu_Buttons/save.png"));
+            save.setBounds(buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             save.addActionListener(e-> save());
 
             textOfSize=new JLabel("Size of map");
-            textOfSize.setBounds(buttonShift,(int)(5.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfSize.setBounds(textfieldShift,(int)(5.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSize.setHorizontalAlignment(JLabel.CENTER);
             textOfSize.setForeground(Color.WHITE);
 
             size_of_map =new JTextField("100");
-            size_of_map.setBounds(buttonShift,6*buttonSpacing,buttonWidth,buttonHeight);
+            size_of_map.setBounds(textfieldShift,6*textfieldSpacing,textfieldWidth,textfieldHeight);
             size_of_map.setHorizontalAlignment(JTextField.CENTER);
 
             textOfNumber=new JLabel("Size of dungeon");
-            textOfNumber.setBounds(buttonShift,(int)(6.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfNumber.setBounds(textfieldShift,(int)(6.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfNumber.setHorizontalAlignment(JLabel.CENTER);
             textOfNumber.setForeground(Color.WHITE);
 
             numberOfElements=new JTextField("1000");
-            numberOfElements.setBounds(buttonShift,7*buttonSpacing,buttonWidth,buttonHeight);
+            numberOfElements.setBounds(textfieldShift,7*textfieldSpacing,textfieldWidth,textfieldHeight);
             numberOfElements.setHorizontalAlignment(JTextField.CENTER);
 
             textOfSeed=new JLabel("Seed");
-            textOfSeed.setBounds(buttonShift,(int)(7.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfSeed.setBounds(textfieldShift,(int)(7.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSeed.setHorizontalAlignment(JLabel.CENTER);
             textOfSeed.setForeground(Color.WHITE);
 
             seed=new JTextField();
-            seed.setBounds(buttonShift,8*buttonSpacing,buttonWidth,buttonHeight);
+            seed.setBounds(textfieldShift,8*textfieldSpacing,textfieldWidth,textfieldHeight);
             seed.setHorizontalAlignment(JTextField.CENTER);
 
             this.add(start);
