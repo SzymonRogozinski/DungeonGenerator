@@ -135,6 +135,7 @@ public class MainPanel extends JPanel {
         private JButton next;
         private JButton restart;
         private JButton save;
+        private JButton speedUp;
         private final JTextField size_of_map;
         private JLabel textOfSize;
         private JTextField numberOfElements;
@@ -180,6 +181,10 @@ public class MainPanel extends JPanel {
             save.setBounds(buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             save.addActionListener(e-> save());
 
+            speedUp=new JButton(new ImageIcon("Menu_Buttons/fast-forward-button.png"));
+            speedUp.setBounds(2*buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
+            speedUp.addActionListener(e-> genereate.changeDelay());
+
             textOfSize=new JLabel("Size of map");
             textOfSize.setBounds(textfieldShift,(int)(5.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSize.setHorizontalAlignment(JLabel.CENTER);
@@ -212,6 +217,7 @@ public class MainPanel extends JPanel {
             this.add(next);
             this.add(restart);
             this.add(save);
+            this.add(speedUp);
             this.add(textOfSize);
             this.add(size_of_map);
             this.add(textOfSize);

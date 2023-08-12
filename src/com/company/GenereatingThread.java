@@ -10,6 +10,7 @@ public class GenereatingThread extends Thread{
     private final double dense;
     private static final double DEFAULT_DENSE = 0.3;
     private static final int DEFAULT_DELAY = 100;
+    private int delay=DEFAULT_DELAY;
     private Map reference;
     private Random random;
     private MainPanel panel;
@@ -46,6 +47,10 @@ public class GenereatingThread extends Thread{
         generating();
     }
 
+    public void changeDelay(){
+        delay=delay==0?DEFAULT_DELAY:0;
+    }
+
     public synchronized void generating(){
         do{
             newStack=new Stack<>();
@@ -79,7 +84,7 @@ public class GenereatingThread extends Thread{
                 }
             }
             try {
-                sleep(DEFAULT_DELAY);
+                sleep(delay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
