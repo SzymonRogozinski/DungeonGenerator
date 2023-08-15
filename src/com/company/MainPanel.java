@@ -13,6 +13,7 @@ public class MainPanel extends JPanel {
     private ControlPanel con;
     private Map map;
     private GenereatingThread genereate;
+    private int algorithmType=1;
 
     private boolean stop;
 
@@ -74,9 +75,9 @@ public class MainPanel extends JPanel {
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
             int seed=getSeedFromPanel();
             if(seed==0)
-                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
+                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,algorithmType);
             else
-                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,seed);
+                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,algorithmType,seed);
             this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
@@ -136,6 +137,10 @@ public class MainPanel extends JPanel {
         private JButton restart;
         private JButton save;
         private JButton speedUp;
+        private JRadioButton firstAlg;
+        private JRadioButton secondAlg;
+        private JRadioButton thirdAlg;
+        private ButtonGroup algorithmChose;
         private final JTextField size_of_map;
         private JLabel textOfSize;
         private JTextField numberOfElements;
@@ -153,6 +158,9 @@ public class MainPanel extends JPanel {
 
             int buttonSize=50;
             int buttonShift=buttonSize/2;
+
+            int radioButtonHeight=30;
+            int radioButtonWidth=100;
 
             this.setPreferredSize(new Dimension(Main.CONTROL_SIZE,Main.DRAW_SIZE));
             this.setBounds(Main.DRAW_SIZE,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
@@ -184,6 +192,25 @@ public class MainPanel extends JPanel {
             speedUp=new JButton(new ImageIcon("Menu_Buttons/fast-forward-button.png"));
             speedUp.setBounds(2*buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             speedUp.addActionListener(e-> genereate.changeDelay());
+
+            //Radio Buttons
+            firstAlg=new JRadioButton("Mrówki");
+            firstAlg.setBounds(buttonShift,2*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
+            firstAlg.addActionListener(e->algorithmType=1);
+            firstAlg.setSelected(true);
+
+            secondAlg=new JRadioButton("Tunele");
+            secondAlg.setBounds(buttonShift,2*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
+            secondAlg.addActionListener(e->algorithmType=2);
+
+            thirdAlg=new JRadioButton("<<placeholder>>");
+            thirdAlg.setBounds(buttonShift,2*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
+            thirdAlg.addActionListener(e->algorithmType=3);
+
+            algorithmChose=new ButtonGroup();
+            algorithmChose.add(firstAlg);
+            algorithmChose.add(secondAlg);
+            algorithmChose.add(thirdAlg);
 
             textOfSize=new JLabel("Size of map");
             textOfSize.setBounds(textfieldShift,(int)(5.5*textfieldSpacing),textfieldWidth,textfieldHeight);
@@ -218,6 +245,9 @@ public class MainPanel extends JPanel {
             this.add(restart);
             this.add(save);
             this.add(speedUp);
+            this.add(firstAlg);
+            this.add(secondAlg);
+            this.add(thirdAlg);
             this.add(textOfSize);
             this.add(size_of_map);
             this.add(textOfSize);
