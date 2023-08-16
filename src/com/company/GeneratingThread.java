@@ -2,7 +2,7 @@ package com.company;
 
 import java.util.Random;
 
-public class GenereatingThread extends Thread{
+public class GeneratingThread extends Thread{
 
     private final double dense;
     private static final double DEFAULT_DENSE = 0.3;
@@ -13,23 +13,31 @@ public class GenereatingThread extends Thread{
     private GeneratingAlgorithm genAlg;
 
 
-    public GenereatingThread(int limit,Map reference,MainPanel panel, int algType) {
+    public GeneratingThread(int limit, Map reference, MainPanel panel, int algType) {
         this.random=new Random();
         this.panel=panel;
         this.dense= DEFAULT_DENSE;
-        //if(algType==1){
+        if(algType==1){
             genAlg=new SimpleAntAlgorithm();
-        //}else
+        }else if(algType==2){
+            genAlg=new TunelAntAlgorithm();
+        }else if(algType==3){
+
+        }
         genAlg.setStart(limit, random,reference,dense);
     }
 
-    public GenereatingThread(int limit,Map reference,MainPanel panel,int algType,int seed) {
+    public GeneratingThread(int limit, Map reference, MainPanel panel, int algType, int seed) {
         this.random=new Random(seed);
         this.panel=panel;
         this.dense= DEFAULT_DENSE;
-        //if(algType==1){
-        genAlg=new SimpleAntAlgorithm();
-        //}else
+        if(algType==1){
+            genAlg=new SimpleAntAlgorithm();
+        }else if(algType==2){
+            genAlg=new TunelAntAlgorithm();
+        }else if(algType==3){
+
+        }
         genAlg.setStart(limit,random,reference,dense);
 
     }

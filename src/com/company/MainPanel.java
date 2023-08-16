@@ -12,7 +12,7 @@ public class MainPanel extends JPanel {
     private DungeonPanel dp;
     private ControlPanel con;
     private Map map;
-    private GenereatingThread genereate;
+    private GeneratingThread genereate;
     private int algorithmType=1;
 
     private boolean stop;
@@ -75,9 +75,9 @@ public class MainPanel extends JPanel {
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
             int seed=getSeedFromPanel();
             if(seed==0)
-                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,algorithmType);
+                this.genereate=new GeneratingThread(getLimitFromPanel(),this.map,this,algorithmType);
             else
-                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,algorithmType,seed);
+                this.genereate=new GeneratingThread(getLimitFromPanel(),this.map,this,algorithmType,seed);
             this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
