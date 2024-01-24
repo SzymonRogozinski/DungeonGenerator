@@ -3,7 +3,7 @@ package com.company;
 import java.awt.image.BufferedImage;
 
 public class Map {
-    private final int width,height;
+    private int width,height;
     private boolean[][] terrain;
 
     private BufferedImage image;
@@ -37,6 +37,20 @@ public class Map {
         if(terrain[y][x])
             throw new AlreadyTrueException();
         terrain[y][x]=true;
+    }
+
+    public void resize(int maxX,int minX,int maxY,int minY){
+        boolean[][] newTerrain=terrain.clone();
+        System.arraycopy(terrain,minY,newTerrain,0,maxY-minY+1);
+        int xLen=maxX-minX+1;
+        newTerrain=new boolean[newTerrain.length][xLen];
+        for (int i=0;i< newTerrain.length;i++) {
+            System.arraycopy(terrain,minX,newTerrain,0,xLen);
+        }
+        terrain=newTerrain;
+        width=xLen;
+        height=maxY-minY+1;
+        image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 
     public class AlreadyTrueException extends Exception{}

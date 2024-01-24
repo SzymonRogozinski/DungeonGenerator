@@ -16,9 +16,11 @@ public class MainPanel extends JPanel {
     private int algorithmType=1;
 
     private boolean stop;
+    private boolean ended;
 
     public MainPanel() {
         stop=true;
+        ended=false;
 
         this.setPreferredSize(new Dimension(Main.DRAW_SIZE+Main.CONTROL_SIZE,Main.DRAW_SIZE));
         this.setLayout(null);
@@ -72,6 +74,7 @@ public class MainPanel extends JPanel {
             stopButton.setEnabled(true);
             genereate.ping();
         }else{
+            ended=false;
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
             int seed=getSeedFromPanel();
             if(seed==0)
@@ -129,6 +132,24 @@ public class MainPanel extends JPanel {
         }
     }
 
+    public synchronized void resizeMap(){
+        if(ended){
+            int[] res=genereate.getSizesFromAlgorithm();
+            System.out.println("maxX: "+res[0]+"\nminX: "+res[1]+"\nmaxY: "+res[2]+"\nminY: "+res[3]);
+            int maxX,minX,maxY,minY;
+            maxX= Math.min(res[0] + 3, map.getWidth());
+            minX=Math.max(res[1]-3,0);
+            maxY=Math.min(res[2]+3, map.getHeight());
+            minY=Math.max(res[3]-3,0);
+            map.resize(maxX,minX,maxY,minY);
+            resetScreen();
+        }
+    }
+
+    public synchronized void algorithmEnded(){
+        ended=true;
+    }
+
     private class ControlPanel extends JPanel {
 
         private JButton start;
@@ -137,6 +158,7 @@ public class MainPanel extends JPanel {
         private JButton restart;
         private JButton save;
         private JButton speedUp;
+        private JButton resize;
         private JRadioButton firstAlg;
         private JRadioButton secondAlg;
         private JRadioButton thirdAlg;
@@ -193,18 +215,23 @@ public class MainPanel extends JPanel {
             speedUp.setBounds(2*buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             speedUp.addActionListener(e-> genereate.changeDelay());
 
+            resize=new JButton(new ImageIcon("Menu_Buttons/contract.png"));
+            resize.setEnabled(true);
+            resize.setBounds(buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
+            resize.addActionListener(e->resizeMap());
+
             //Radio Buttons
             firstAlg=new JRadioButton("Mrówki");
-            firstAlg.setBounds(buttonShift,2*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
+            firstAlg.setBounds(buttonShift,3*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
             firstAlg.addActionListener(e->algorithmType=1);
             firstAlg.setSelected(true);
 
             secondAlg=new JRadioButton("Tunele");
-            secondAlg.setBounds(buttonShift,2*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
+            secondAlg.setBounds(buttonShift,3*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
             secondAlg.addActionListener(e->algorithmType=2);
 
             thirdAlg=new JRadioButton("<<placeholder>>");
-            thirdAlg.setBounds(buttonShift,2*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
+            thirdAlg.setBounds(buttonShift,3*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
             thirdAlg.addActionListener(e->algorithmType=3);
 
             algorithmChose=new ButtonGroup();
@@ -245,6 +272,7 @@ public class MainPanel extends JPanel {
             this.add(restart);
             this.add(save);
             this.add(speedUp);
+            this.add(resize);
             this.add(firstAlg);
             this.add(secondAlg);
             this.add(thirdAlg);

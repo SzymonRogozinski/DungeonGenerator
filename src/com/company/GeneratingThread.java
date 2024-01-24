@@ -49,10 +49,15 @@ public class GeneratingThread extends Thread{
     @Override
     public void run(){
         generating();
+        panel.algorithmEnded();
     }
 
     public void changeDelay(){
         delay=delay==0?DEFAULT_DELAY:0;
+    }
+
+    public int[] getSizesFromAlgorithm(){
+        return  genAlg.getSize();
     }
 
     public synchronized void generating(){

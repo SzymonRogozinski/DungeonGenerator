@@ -12,12 +12,18 @@ public class TunelAntAlgorithm implements GeneratingAlgorithm{
     private Random random;
     private Map reference;
     private double dense;
+    private int maxX,minX,maxY,minY;
 
     @Override
     public void setStart(int limit,Random random, Map reference,double dense){
         this.limit=limit;
         stack=new Stack<>();
         stack.add(new SmartAnt(random.nextInt(reference.getWidth()/3,2*reference.getWidth())/3,random.nextInt(reference.getHeight()/3,2*reference.getHeight()/3)));
+        //init sizes
+        maxX=stack.peek().getX();
+        minX=maxX;
+        maxY=stack.peek().getY();
+        minY=maxY;
         this.random=random;
         this.reference=reference;
         this.dense=dense;
@@ -44,16 +50,37 @@ public class TunelAntAlgorithm implements GeneratingAlgorithm{
             if(nextAnt==null){
             }else if (random.nextDouble()>dense) {
                 newStack.add(nextAnt);
+                checkSizes(nextAnt);
             } else {
                 newStack.add(nextAnt);
+                checkSizes(nextAnt);
                 nextAnt=ant.getNextRandomAnt(reference,random);
                 if(nextAnt!=null){
                     newStack.add(nextAnt);
+                    checkSizes(nextAnt);
                 }
             }
         }
         stack=newStack;
         return stack.empty();
+    }
+
+    private void checkSizes(Ant ant){
+        if(ant.getX()>maxX){
+            maxX=ant.getX();
+        } else if (ant.getX()<minX) {
+            minX=ant.getX();
+        }
+        if(ant.getY()>maxY){
+            maxY=ant.getY();
+        } else if (ant.getY()<minY) {
+            minY=ant.getY();
+        }
+    }
+
+    @Override
+    public int[] getSize(){
+        return new int[]{maxX,minX,maxY,minY};
     }
 }
 

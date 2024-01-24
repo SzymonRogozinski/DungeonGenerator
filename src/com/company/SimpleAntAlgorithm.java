@@ -12,12 +12,18 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
     private Random random;
     private Map reference;
     private double dense;
+    private int maxX,minX,maxY,minY;
 
     @Override
     public void setStart(int limit,Random random, Map reference,double dense){
         this.limit=limit;
         stack=new Stack<>();
         stack.add(new Ant(random.nextInt(reference.getWidth()/3,2*reference.getWidth())/3,random.nextInt(reference.getHeight()/3,2*reference.getHeight()/3)));
+        //init sizes
+        maxX=stack.peek().getX();
+        minX=maxX;
+        maxY=stack.peek().getY();
+        minY=maxY;
         this.random=random;
         this.reference=reference;
         this.dense=dense;
@@ -73,5 +79,10 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
             n.add(new Ant(p.getX(), p.getY() + 1));
         }
         return  n;
+    }
+
+    @Override
+    public int[] getSize(){
+        return new int[]{maxX,minX,maxY,minY};
     }
 }
