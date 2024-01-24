@@ -3,6 +3,7 @@ package com.company;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -11,7 +12,8 @@ public class MainPanel extends JPanel {
     private DungeonPanel dp;
     private ControlPanel con;
     private Map map;
-    private GenereatingThread genereate;
+    private GeneratingThread genereate;
+    private int algorithmType=1;
 
     private boolean stop;
 
@@ -73,9 +75,9 @@ public class MainPanel extends JPanel {
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
             int seed=getSeedFromPanel();
             if(seed==0)
-                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this);
+                this.genereate=new GeneratingThread(getLimitFromPanel(),this.map,this,algorithmType);
             else
-                this.genereate=new GenereatingThread(getLimitFromPanel(),this.map,this,seed);
+                this.genereate=new GeneratingThread(getLimitFromPanel(),this.map,this,algorithmType,seed);
             this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
@@ -112,7 +114,14 @@ public class MainPanel extends JPanel {
     public synchronized void save() {
         if(!genereate.isAlive()){
             try {
-                ImageIO.write(map.getImage(), "png", new File("mapka.png"));
+                //Przeskalowanie
+                Image tmp = map.getImage().getScaledInstance(Main.DRAW_SIZE, Main.DRAW_SIZE, Image.SCALE_SMOOTH);
+                BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_BYTE_BINARY);
+                Graphics2D g2d = dimg.createGraphics();
+                g2d.drawImage(tmp, 0, 0, null);
+                g2d.dispose();
+                //Zapis
+                ImageIO.write(dimg, "png", new File("mapka.png"));
             }catch (IOException ignore){}
         }
         else{
@@ -127,6 +136,11 @@ public class MainPanel extends JPanel {
         private JButton next;
         private JButton restart;
         private JButton save;
+        private JButton speedUp;
+        private JRadioButton firstAlg;
+        private JRadioButton secondAlg;
+        private JRadioButton thirdAlg;
+        private ButtonGroup algorithmChose;
         private final JTextField size_of_map;
         private JLabel textOfSize;
         private JTextField numberOfElements;
@@ -137,63 +151,92 @@ public class MainPanel extends JPanel {
         public ControlPanel(){
             super();
 
-            int buttonWidth=Main.CONTROL_SIZE/2;
-            int buttonHeight=Main.DRAW_SIZE/20;
-            int buttonShift=buttonWidth/2;
-            int buttonSpacing=buttonHeight*2;
+            int textfieldWidth=Main.CONTROL_SIZE/2;
+            int textfieldHeight=Main.DRAW_SIZE/20;
+            int textfieldShift=textfieldWidth/2;
+            int textfieldSpacing=textfieldHeight*2;
+
+            int buttonSize=50;
+            int buttonShift=buttonSize/2;
+
+            int radioButtonHeight=30;
+            int radioButtonWidth=100;
 
             this.setPreferredSize(new Dimension(Main.CONTROL_SIZE,Main.DRAW_SIZE));
             this.setBounds(Main.DRAW_SIZE,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
             this.setBackground(Color.RED);
             this.setLayout(null);
 
-            start=new JButton("Start");
-            start.setBounds(buttonShift,buttonSpacing,buttonWidth,buttonHeight);
+            start=new JButton(new ImageIcon("Menu_Buttons/play-button.png"));
+            start.setBounds(buttonShift,buttonShift,buttonSize,buttonSize);
             start.addActionListener(e->continueMode(stop,next,start,restart));
 
-            stop=new JButton("Stop");
+            stop=new JButton(new ImageIcon("Menu_Buttons/pause-button.png"));
             stop.setEnabled(false);
-            stop.setBounds(buttonShift,2*buttonSpacing,buttonWidth,buttonHeight);
+            stop.setBounds(buttonSize+buttonShift,buttonShift,buttonSize,buttonSize);
             stop.addActionListener(e->stop(stop,next,start));
 
-            next=new JButton("Next");
+            next=new JButton(new ImageIcon("Menu_Buttons/next-button.png"));
             next.setEnabled(false);
-            next.setBounds(buttonShift,3*buttonSpacing,buttonWidth,buttonHeight);
+            next.setBounds(buttonSize*2+buttonShift,buttonShift,buttonSize,buttonSize);
             next.addActionListener(e->next());
 
-            restart=new JButton("Restart");
-            restart.setBounds(buttonShift,4*buttonSpacing,buttonWidth,buttonHeight);
+            restart=new JButton(new ImageIcon("Menu_Buttons/clockwise-rotation.png"));
+            restart.setBounds(buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             restart.addActionListener(e->restart(stop,next,start,restart));
 
-            save=new JButton("Save");
-            save.setBounds(buttonShift,5*buttonSpacing,buttonWidth,buttonHeight);
+            save=new JButton(new ImageIcon("Menu_Buttons/save.png"));
+            save.setBounds(buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
             save.addActionListener(e-> save());
 
+            speedUp=new JButton(new ImageIcon("Menu_Buttons/fast-forward-button.png"));
+            speedUp.setBounds(2*buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
+            speedUp.addActionListener(e-> genereate.changeDelay());
+
+            //Radio Buttons
+            firstAlg=new JRadioButton("Mrówki");
+            firstAlg.setBounds(buttonShift,2*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
+            firstAlg.addActionListener(e->algorithmType=1);
+            firstAlg.setSelected(true);
+
+            secondAlg=new JRadioButton("Tunele");
+            secondAlg.setBounds(buttonShift,2*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
+            secondAlg.addActionListener(e->algorithmType=2);
+
+            thirdAlg=new JRadioButton("<<placeholder>>");
+            thirdAlg.setBounds(buttonShift,2*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
+            thirdAlg.addActionListener(e->algorithmType=3);
+
+            algorithmChose=new ButtonGroup();
+            algorithmChose.add(firstAlg);
+            algorithmChose.add(secondAlg);
+            algorithmChose.add(thirdAlg);
+
             textOfSize=new JLabel("Size of map");
-            textOfSize.setBounds(buttonShift,(int)(5.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfSize.setBounds(textfieldShift,(int)(5.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSize.setHorizontalAlignment(JLabel.CENTER);
             textOfSize.setForeground(Color.WHITE);
 
             size_of_map =new JTextField("100");
-            size_of_map.setBounds(buttonShift,6*buttonSpacing,buttonWidth,buttonHeight);
+            size_of_map.setBounds(textfieldShift,6*textfieldSpacing,textfieldWidth,textfieldHeight);
             size_of_map.setHorizontalAlignment(JTextField.CENTER);
 
             textOfNumber=new JLabel("Size of dungeon");
-            textOfNumber.setBounds(buttonShift,(int)(6.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfNumber.setBounds(textfieldShift,(int)(6.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfNumber.setHorizontalAlignment(JLabel.CENTER);
             textOfNumber.setForeground(Color.WHITE);
 
             numberOfElements=new JTextField("1000");
-            numberOfElements.setBounds(buttonShift,7*buttonSpacing,buttonWidth,buttonHeight);
+            numberOfElements.setBounds(textfieldShift,7*textfieldSpacing,textfieldWidth,textfieldHeight);
             numberOfElements.setHorizontalAlignment(JTextField.CENTER);
 
             textOfSeed=new JLabel("Seed");
-            textOfSeed.setBounds(buttonShift,(int)(7.5*buttonSpacing),buttonWidth,buttonHeight);
+            textOfSeed.setBounds(textfieldShift,(int)(7.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSeed.setHorizontalAlignment(JLabel.CENTER);
             textOfSeed.setForeground(Color.WHITE);
 
             seed=new JTextField();
-            seed.setBounds(buttonShift,8*buttonSpacing,buttonWidth,buttonHeight);
+            seed.setBounds(textfieldShift,8*textfieldSpacing,textfieldWidth,textfieldHeight);
             seed.setHorizontalAlignment(JTextField.CENTER);
 
             this.add(start);
@@ -201,6 +244,10 @@ public class MainPanel extends JPanel {
             this.add(next);
             this.add(restart);
             this.add(save);
+            this.add(speedUp);
+            this.add(firstAlg);
+            this.add(secondAlg);
+            this.add(thirdAlg);
             this.add(textOfSize);
             this.add(size_of_map);
             this.add(textOfSize);
@@ -226,20 +273,18 @@ public class MainPanel extends JPanel {
                 g.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
                 return;
             }
-            int scaleX=Main.DRAW_SIZE/map.getWidth();
-            int scaleY=Main.DRAW_SIZE/map.getHeight();
             Graphics2D mapGraphics=map.getImage().createGraphics();
             mapGraphics.setColor(Color.BLACK);
-            mapGraphics.fillRect(0,0,Main.DRAW_SIZE,Main.DRAW_SIZE);
+            mapGraphics.fillRect(0,0,map.getWidth(),map.getHeight());
             mapGraphics.setColor(Color.WHITE);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
                     if(map.getTerrain(j,i))
-                        mapGraphics.fillRect(j*scaleX,i*scaleY,scaleX,scaleY);
+                        mapGraphics.fillRect(j,i,1,1);
                 }
             }
             mapGraphics.dispose();
-            g.drawImage(map.getImage(),0,0,null);
+            g.drawImage(map.getImage(),0,0,Main.DRAW_SIZE,Main.DRAW_SIZE,null);
         }
     }
 }
