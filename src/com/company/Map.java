@@ -40,16 +40,23 @@ public class Map {
     }
 
     public void resize(int maxX,int minX,int maxY,int minY){
-        boolean[][] newTerrain=terrain.clone();
-        System.arraycopy(terrain,minY,newTerrain,0,maxY-minY+1);
-        int xLen=maxX-minX+1;
-        newTerrain=new boolean[newTerrain.length][xLen];
+        //New width and height
+        int xLen=maxX-minX;
+        int yLen=maxY-minY;
+        //Cutting height
+        boolean[][] newTerrain=new boolean[yLen][width];
+        System.arraycopy(terrain,minY,newTerrain,0,maxY-minY);
+        //Saving changes
+        terrain=newTerrain;
+        //Cutting width
+        newTerrain=new boolean[yLen][xLen];
         for (int i=0;i< newTerrain.length;i++) {
-            System.arraycopy(terrain,minX,newTerrain,0,xLen);
+            System.arraycopy(terrain[i],minX,newTerrain[i],0,xLen);
         }
+        //Saving changes
         terrain=newTerrain;
         width=xLen;
-        height=maxY-minY+1;
+        height=yLen;
         image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 

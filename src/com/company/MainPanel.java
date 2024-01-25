@@ -135,7 +135,6 @@ public class MainPanel extends JPanel {
     public synchronized void resizeMap(){
         if(ended){
             int[] res=genereate.getSizesFromAlgorithm();
-            System.out.println("maxX: "+res[0]+"\nminX: "+res[1]+"\nmaxY: "+res[2]+"\nminY: "+res[3]);
             int maxX,minX,maxY,minY;
             maxX= Math.min(res[0] + 3, map.getWidth());
             minX=Math.max(res[1]-3,0);

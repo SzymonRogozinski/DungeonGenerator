@@ -50,14 +50,33 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
             //Dorzucenie do nowego stosu
             if(neighbour.size()==0){
             }else if (neighbour.size() < 3 || random.nextDouble()>dense) {
-                newStack.add(neighbour.get(random.nextInt(neighbour.size())));
+                Ant nextAnt=neighbour.get(random.nextInt(neighbour.size()));
+                checkSizes(nextAnt);
+                newStack.add(nextAnt);
             } else {
-                newStack.add(neighbour.get(random.nextInt(neighbour.size())));
-                newStack.add(neighbour.get(random.nextInt(neighbour.size())));
+                Ant nextAnt=neighbour.get(random.nextInt(neighbour.size()));
+                checkSizes(nextAnt);
+                newStack.add(nextAnt);
+                nextAnt=neighbour.get(random.nextInt(neighbour.size()));
+                checkSizes(nextAnt);
+                newStack.add(nextAnt);
             }
         }
         stack=newStack;
         return stack.empty();
+    }
+
+    private void checkSizes(Ant ant){
+        if(ant.getX()>maxX){
+            maxX=ant.getX();
+        } else if (ant.getX()<minX) {
+            minX=ant.getX();
+        }
+        if(ant.getY()>maxY){
+            maxY=ant.getY();
+        } else if (ant.getY()<minY) {
+            minY=ant.getY();
+        }
     }
 
     private ArrayList<Ant> howManyNeighbour(Ant p,Map reference){
