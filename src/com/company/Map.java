@@ -45,20 +45,28 @@ public class Map {
         //New width and height
         int xLen=maxX-minX;
         int yLen=maxY-minY;
+        //Centering
+        int xMargin=margin;
+        int yMargin=margin;
+        if(xLen>yLen){
+            yMargin=(xLen-yLen)/2+margin;
+        } else if (xLen<yLen) {
+            xMargin=(yLen-xLen)/2+margin;
+        }
         //Cutting height
-        boolean[][] newTerrain=new boolean[yLen+2*margin][width];
-        System.arraycopy(terrain,minY,newTerrain,margin,yLen);
+        boolean[][] newTerrain=new boolean[yLen+2*yMargin][width];
+        System.arraycopy(terrain,minY,newTerrain,yMargin,yLen);
         //Saving changes
         terrain=newTerrain;
         //Cutting width
-        newTerrain=new boolean[yLen+2*margin][xLen+2*margin];
+        newTerrain=new boolean[yLen+2*yMargin][xLen+2*xMargin];
         for (int i=0;i< newTerrain.length;i++) {
-            System.arraycopy(terrain[i],minX,newTerrain[i],margin,xLen);
+            System.arraycopy(terrain[i],minX,newTerrain[i],xMargin,xLen);
         }
         //Saving changes
         terrain=newTerrain;
-        width=xLen+2*margin;
-        height=yLen+2*margin;
+        width=xLen+2*xMargin;
+        height=yLen+2*yMargin;
         image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 

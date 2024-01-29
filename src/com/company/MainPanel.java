@@ -17,10 +17,12 @@ public class MainPanel extends JPanel {
 
     private boolean stop;
     private boolean ended;
+    private boolean resized;
 
     public MainPanel() {
         stop=true;
         ended=false;
+        resized=false;
 
         this.setPreferredSize(new Dimension(Main.DRAW_SIZE+Main.CONTROL_SIZE,Main.DRAW_SIZE));
         this.setLayout(null);
@@ -75,6 +77,7 @@ public class MainPanel extends JPanel {
             genereate.ping();
         }else{
             ended=false;
+            resized=false;
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
             int seed=getSeedFromPanel();
             if(seed==0)
@@ -133,10 +136,11 @@ public class MainPanel extends JPanel {
     }
 
     public synchronized void resizeMap(){
-        if(ended){
+        if(ended && !resized){
             int[] res=genereate.getSizesFromAlgorithm();
             map.resize(res[0],res[1],res[2],res[3]);
             resetScreen();
+            resized=true;
         }
     }
 
