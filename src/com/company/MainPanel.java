@@ -144,19 +144,20 @@ public class MainPanel extends JPanel {
         }
     }
 
+    public synchronized void drawMapBorder(){
+        if(ended && resized){
+            map.drawBorder();
+            resetScreen();
+        }
+    }
+
     public synchronized void algorithmEnded(){
         ended=true;
     }
 
     private class ControlPanel extends JPanel {
 
-        private JButton start;
-        private JButton stop;
-        private JButton next;
-        private JButton restart;
-        private JButton save;
-        private JButton speedUp;
-        private JButton resize;
+        private JButton start,stop,next,restart,save,speedUp,resize,border;
         private JRadioButton firstAlg;
         private JRadioButton secondAlg;
         private JRadioButton thirdAlg;
@@ -218,6 +219,11 @@ public class MainPanel extends JPanel {
             resize.setBounds(buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
             resize.addActionListener(e->resizeMap());
 
+            border=new JButton(new ImageIcon("Menu_Buttons/highlighter.png"));
+            border.setEnabled(true);
+            border.setBounds(buttonSize+buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
+            border.addActionListener(e->drawMapBorder());
+
             //Radio Buttons
             firstAlg=new JRadioButton("Mrówki");
             firstAlg.setBounds(buttonShift,3*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
@@ -271,6 +277,7 @@ public class MainPanel extends JPanel {
             this.add(save);
             this.add(speedUp);
             this.add(resize);
+            this.add(border);
             this.add(firstAlg);
             this.add(secondAlg);
             this.add(thirdAlg);
@@ -305,8 +312,17 @@ public class MainPanel extends JPanel {
             mapGraphics.setColor(Color.WHITE);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
-                    if(map.getTerrain(j,i))
-                        mapGraphics.fillRect(j,i,1,1);
+                    if(map.getTerrain(j,i)) {
+                        mapGraphics.fillRect(j, i, 1, 1);
+                    }
+                }
+            }
+            mapGraphics.setColor(Color.RED);
+            for(int i=0;i<map.getHeight();i++){
+                for(int j=0;j<map.getWidth();j++){
+                    if(map.getBorder(j,i)) {
+                        mapGraphics.fillRect(j, i, 1, 1);
+                    }
                 }
             }
             mapGraphics.dispose();

@@ -1,19 +1,22 @@
 package com.company;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Map {
     private int width,height;
     private boolean[][] terrain;
+    private boolean [][] border;
 
     private BufferedImage image;
 
-    private static int margin=3;
+    private final static int margin=3;
 
     public Map(int width, int height) {
         this.width = width;
         this.height = height;
         terrain=new boolean[height][width];
+        border=new boolean[height][width];
         image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 
@@ -31,6 +34,11 @@ public class Map {
         if(x<0 || y<0 || x>=width || y>=height)
             throw new IllegalArgumentException();
         return terrain[y][x];
+    }
+    public boolean getBorder(int x,int y){
+        if(x<0 || y<0 || x>=width || y>=height)
+            throw new IllegalArgumentException();
+        return border[y][x];
     }
 
     public void setTerrain(int x,int y) throws AlreadyTrueException {
@@ -67,8 +75,21 @@ public class Map {
         terrain=newTerrain;
         width=xLen+2*xMargin;
         height=yLen+2*yMargin;
-        image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
+        border=new boolean[height][width];
+        image=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
     }
 
-    public class AlreadyTrueException extends Exception{}
+    public void drawBorder(){
+        border=new boolean[height][width];
+        for(int y=1;y<height-1;y++){
+            for(int x=1;x<width-1;x++){
+                if((terrain[y][x-1] ||terrain[y][x+1] ||terrain[y-1][x] ||terrain[y+1][x]) && !terrain[y][x] ){
+                    border[y][x]=true;
+                }
+            }
+        }
+
+    }
+
+    public static class AlreadyTrueException extends Exception{}
 }
