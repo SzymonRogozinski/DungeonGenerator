@@ -8,6 +8,8 @@ public class Map {
 
     private BufferedImage image;
 
+    private static int margin=3;
+
     public Map(int width, int height) {
         this.width = width;
         this.height = height;
@@ -44,19 +46,19 @@ public class Map {
         int xLen=maxX-minX;
         int yLen=maxY-minY;
         //Cutting height
-        boolean[][] newTerrain=new boolean[yLen][width];
-        System.arraycopy(terrain,minY,newTerrain,0,maxY-minY);
+        boolean[][] newTerrain=new boolean[yLen+2*margin][width];
+        System.arraycopy(terrain,minY,newTerrain,margin,yLen);
         //Saving changes
         terrain=newTerrain;
         //Cutting width
-        newTerrain=new boolean[yLen][xLen];
+        newTerrain=new boolean[yLen+2*margin][xLen+2*margin];
         for (int i=0;i< newTerrain.length;i++) {
-            System.arraycopy(terrain[i],minX,newTerrain[i],0,xLen);
+            System.arraycopy(terrain[i],minX,newTerrain[i],margin,xLen);
         }
         //Saving changes
         terrain=newTerrain;
-        width=xLen;
-        height=yLen;
+        width=xLen+2*margin;
+        height=yLen+2*margin;
         image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 
