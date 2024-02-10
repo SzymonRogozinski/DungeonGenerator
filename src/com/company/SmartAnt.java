@@ -7,7 +7,7 @@ public class SmartAnt extends Ant{
 
     private int counter;
     private Direction dir;
-    private static int[][] directions= new int[][]{{-1,0}, {0,-1},{1,0},{0,1}};
+    private static final int[][] directions= new int[][]{{-1,0}, {0,-1},{1,0},{0,1}};
     private static final int randWide=10;
     private static final int randConst=2;
 
@@ -77,7 +77,7 @@ public class SmartAnt extends Ant{
 
         public boolean checkNextAnt(SmartAnt ant, Map map){
             try{
-                return map.getTerrain(ant.getX()+dx,ant.getY()+dy);
+                return map.getTerrain(ant.getX()+dx,ant.getY()+dy)==Place.FLOOR;
             }catch(IllegalArgumentException e){
                 return true;
             }

@@ -40,6 +40,7 @@ public class TunelAntAlgorithm implements GeneratingAlgorithm{
         while (!stack.empty()) {
             try {
                 reference.setTerrain(stack.peek().getX(), stack.peek().getY());
+                checkSizes(stack.peek());
             }catch (Map.AlreadyTrueException  | IllegalArgumentException e){
                 stack.pop();
                 continue;
@@ -50,14 +51,11 @@ public class TunelAntAlgorithm implements GeneratingAlgorithm{
             if(nextAnt==null){
             }else if (random.nextDouble()>dense) {
                 newStack.add(nextAnt);
-                checkSizes(nextAnt);
             } else {
                 newStack.add(nextAnt);
-                checkSizes(nextAnt);
                 nextAnt=ant.getNextRandomAnt(reference,random);
                 if(nextAnt!=null){
                     newStack.add(nextAnt);
-                    checkSizes(nextAnt);
                 }
             }
         }

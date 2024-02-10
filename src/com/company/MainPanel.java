@@ -15,14 +15,10 @@ public class MainPanel extends JPanel {
     private GeneratingThread genereate;
     private int algorithmType=1;
 
-    private boolean stop;
-    private boolean ended;
-    private boolean resized;
+    public GeneratingState state;
 
     public MainPanel() {
-        stop=true;
-        ended=false;
-        resized=false;
+        state=new GeneratingState();
 
         this.setPreferredSize(new Dimension(Main.DRAW_SIZE+Main.CONTROL_SIZE,Main.DRAW_SIZE));
         this.setLayout(null);
@@ -30,10 +26,6 @@ public class MainPanel extends JPanel {
         this.add(dp);
         con=new ControlPanel();
         this.add(con);
-    }
-
-    public boolean isStop() {
-        return stop;
     }
 
     private int getSizeFromPanel(){
@@ -55,12 +47,15 @@ public class MainPanel extends JPanel {
     }
 
     private int getSeedFromPanel(){
+        if(con.seed.getText().isEmpty() || con.seed.getText()==null){
+            return 0;
+        }
         try{
             return Integer.parseInt(con.seed.getText());
         }catch(NumberFormatException e){
             System.err.println(con.seed.getText()+" is not a number!");
+            return 0;
         }
-        return 0;
     }
 
     public void resetScreen(){
@@ -70,31 +65,30 @@ public class MainPanel extends JPanel {
 
     public synchronized void continueMode(JButton stopButton,JButton nextButton,JButton startButton,JButton restartButton){
         if(genereate!=null && genereate.isAlive()) {
-            this.stop = false;
+            state.run();
             nextButton.setEnabled(false);
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
             genereate.ping();
         }else{
-            ended=false;
-            resized=false;
+            state.restartState();
             this.map=new Map(getSizeFromPanel(), getSizeFromPanel());
             int seed=getSeedFromPanel();
             if(seed==0)
                 this.genereate=new GeneratingThread(getLimitFromPanel(),this.map,this,algorithmType);
             else
                 this.genereate=new GeneratingThread(getLimitFromPanel(),this.map,this,algorithmType,seed);
-            this.stop=false;
             stopButton.setEnabled(true);
             nextButton.setEnabled(false);
             startButton.setEnabled(false);
             restartButton.setEnabled(true);
+            state.startWork();
             genereate.start();
         }
     }
 
     public synchronized void restart(JButton stopButton,JButton nextButton,JButton startButton,JButton restartButton){
-        stop=true;
+        state.stop();
         genereate.stop();
 
         this.map=null;
@@ -107,7 +101,7 @@ public class MainPanel extends JPanel {
     }
 
     public synchronized void stop(JButton stopButton,JButton nextButton,JButton startButton){
-        stop=true;
+        state.stop();
         stopButton.setEnabled(false);
         startButton.setEnabled(true);
         nextButton.setEnabled(true);
@@ -135,39 +129,96 @@ public class MainPanel extends JPanel {
         }
     }
 
+    public synchronized void speedUpGenerate(){
+        genereate.changeDelay();
+        state.speedUp();
+    }
+
     public synchronized void resizeMap(){
-        if(ended && !resized){
+        if(state.readyToResize()){
             int[] res=genereate.getSizesFromAlgorithm();
             map.resize(res[0],res[1],res[2],res[3]);
             resetScreen();
-            resized=true;
+            state.resized();
         }
     }
 
     public synchronized void drawMapBorder(){
-        if(ended && resized){
+        if(state.isResized()){
             map.drawBorder();
             resetScreen();
         }
     }
 
     public synchronized void algorithmEnded(){
-        ended=true;
+        state.GenerateEnd();
+    }
+
+    public class GeneratingState{
+        private boolean working;
+        private boolean stopped;    //Can be true only while working is true
+        private boolean resized;    //Only after work was ended
+
+        public boolean isWorking(){
+            return working;
+        }
+
+        public void startWork(){
+            working=true;
+        }
+
+        public void endWork(){
+            working=false;
+        }
+
+        public void GenerateEnd(){
+            working=false;
+        }
+
+        public boolean isResized(){
+            return resized;
+        }
+
+        public void resized(){
+            resized=true;
+        }
+
+        public boolean readyToResize(){
+            return !(working || resized);
+        }
+
+        public void stop(){
+            stopped=true;
+        }
+
+        public void run(){
+            stopped=false;
+        }
+
+        public void speedUp(){
+            stopped=false;
+            genereate.ping();
+        }
+
+        public boolean isStopped(){
+            return stopped;
+        }
+
+        public void restartState(){
+            working=false;
+            stopped=false;
+            resized=false;
+        }
+
     }
 
     private class ControlPanel extends JPanel {
 
-        private JButton start,stop,next,restart,save,speedUp,resize,border;
-        private JRadioButton firstAlg;
-        private JRadioButton secondAlg;
-        private JRadioButton thirdAlg;
-        private ButtonGroup algorithmChose;
-        private final JTextField size_of_map;
-        private JLabel textOfSize;
-        private JTextField numberOfElements;
-        private JLabel textOfNumber;
-        private JTextField seed;
-        private JLabel textOfSeed;
+        private final JButton start,stop,next,restart,save,speedUp,resize,border;
+        private final JRadioButton firstAlg,secondAlg,thirdAlg;
+        private final ButtonGroup algorithmChose;
+        private final JTextField size_of_map,numberOfElements,seed;
+        private final JLabel textOfSize,textOfNumber,textOfSeed;
 
         public ControlPanel(){
             super();
@@ -190,20 +241,21 @@ public class MainPanel extends JPanel {
 
             start=new JButton(new ImageIcon("Menu_Buttons/play-button.png"));
             start.setBounds(buttonShift,buttonShift,buttonSize,buttonSize);
-            start.addActionListener(e->continueMode(stop,next,start,restart));
 
             stop=new JButton(new ImageIcon("Menu_Buttons/pause-button.png"));
             stop.setEnabled(false);
             stop.setBounds(buttonSize+buttonShift,buttonShift,buttonSize,buttonSize);
-            stop.addActionListener(e->stop(stop,next,start));
 
             next=new JButton(new ImageIcon("Menu_Buttons/next-button.png"));
             next.setEnabled(false);
             next.setBounds(buttonSize*2+buttonShift,buttonShift,buttonSize,buttonSize);
-            next.addActionListener(e->next());
 
             restart=new JButton(new ImageIcon("Menu_Buttons/clockwise-rotation.png"));
             restart.setBounds(buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
+
+            start.addActionListener(e->continueMode(stop,next,start,restart));
+            stop.addActionListener(e->stop(stop,next,start));
+            next.addActionListener(e->next());
             restart.addActionListener(e->restart(stop,next,start,restart));
 
             save=new JButton(new ImageIcon("Menu_Buttons/save.png"));
@@ -212,7 +264,8 @@ public class MainPanel extends JPanel {
 
             speedUp=new JButton(new ImageIcon("Menu_Buttons/fast-forward-button.png"));
             speedUp.setBounds(2*buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
-            speedUp.addActionListener(e-> genereate.changeDelay());
+            //speedUp.addActionListener(e-> genereate.changeDelay());
+            speedUp.addActionListener(e-> speedUpGenerate());
 
             resize=new JButton(new ImageIcon("Menu_Buttons/contract.png"));
             resize.setEnabled(true);
@@ -312,7 +365,7 @@ public class MainPanel extends JPanel {
             mapGraphics.setColor(Color.WHITE);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
-                    if(map.getTerrain(j,i)) {
+                    if(map.getTerrain(j,i)==Place.FLOOR) {
                         mapGraphics.fillRect(j, i, 1, 1);
                     }
                 }
@@ -320,7 +373,7 @@ public class MainPanel extends JPanel {
             mapGraphics.setColor(Color.RED);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
-                    if(map.getBorder(j,i)) {
+                    if(map.getTerrain(j,i)==Place.WALL) {
                         mapGraphics.fillRect(j, i, 1, 1);
                     }
                 }

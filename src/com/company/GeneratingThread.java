@@ -66,7 +66,7 @@ public class GeneratingThread extends Thread{
             isEmpty=genAlg.generate();
             //resetEkanu
             panel.resetScreen();
-            if(panel.isStop()){
+            if(panel.state.isStopped()){
                 try {
                     wait();
                 } catch (InterruptedException e) {

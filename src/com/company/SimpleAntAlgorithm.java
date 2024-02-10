@@ -40,6 +40,7 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
         while (!stack.empty()) {
             try {
                 reference.setTerrain(stack.peek().getX(), stack.peek().getY());
+                checkSizes(stack.peek());
             }catch (Map.AlreadyTrueException e){
                 stack.pop();
                 continue;
@@ -51,14 +52,11 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
             if(neighbour.size()==0){
             }else if (neighbour.size() < 3 || random.nextDouble()>dense) {
                 Ant nextAnt=neighbour.get(random.nextInt(neighbour.size()));
-                checkSizes(nextAnt);
                 newStack.add(nextAnt);
             } else {
                 Ant nextAnt=neighbour.get(random.nextInt(neighbour.size()));
-                checkSizes(nextAnt);
                 newStack.add(nextAnt);
                 nextAnt=neighbour.get(random.nextInt(neighbour.size()));
-                checkSizes(nextAnt);
                 newStack.add(nextAnt);
             }
         }
@@ -82,19 +80,19 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
     private ArrayList<Ant> howManyNeighbour(Ant p,Map reference){
         ArrayList<Ant> n=new ArrayList<>();
         //Góra
-        if(p.getY()>0 && !reference.getTerrain(p.getX(),p.getY()-1)){
+        if(p.getY()>0 && reference.getTerrain(p.getX(),p.getY()-1)!=Place.FLOOR){
             n.add(new Ant(p.getX(),p.getY()-1));
         }
         //Lewo
-        if(p.getX()>0 && !reference.getTerrain(p.getX()-1,p.getY())){
+        if(p.getX()>0 && reference.getTerrain(p.getX()-1,p.getY())!=Place.FLOOR){
             n.add(new Ant(p.getX()-1,p.getY()));
         }
         //Prawo
-        if(p.getX()<reference.getWidth()-1 && !reference.getTerrain(p.getX()+1,p.getY())){
+        if(p.getX()<reference.getWidth()-1 && reference.getTerrain(p.getX()+1,p.getY())!=Place.FLOOR){
             n.add(new Ant(p.getX()+1,p.getY()));
         }
         //Dół
-        if(p.getY()< reference.getHeight()-1 && !reference.getTerrain(p.getX(),p.getY()+1)) {
+        if(p.getY()< reference.getHeight()-1 && reference.getTerrain(p.getX(),p.getY()+1)!=Place.FLOOR) {
             n.add(new Ant(p.getX(), p.getY() + 1));
         }
         return  n;

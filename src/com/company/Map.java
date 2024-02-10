@@ -2,11 +2,11 @@ package com.company;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Map {
     private int width,height;
-    private boolean[][] terrain;
-    private boolean [][] border;
+    private Place [][] terrain;
 
     private BufferedImage image;
 
@@ -15,8 +15,12 @@ public class Map {
     public Map(int width, int height) {
         this.width = width;
         this.height = height;
-        terrain=new boolean[height][width];
-        border=new boolean[height][width];
+        //terrain=new boolean[height][width];
+        //border=new boolean[height][width];
+        terrain=new Place[height][width];
+        for (Place[] places: terrain) {
+            Arrays.fill(places,Place.VOID);
+        }
         image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
     }
 
@@ -30,23 +34,18 @@ public class Map {
 
     public BufferedImage getImage(){return image;}
 
-    public boolean getTerrain(int x,int y){
+    public Place getTerrain(int x,int y){
         if(x<0 || y<0 || x>=width || y>=height)
             throw new IllegalArgumentException();
         return terrain[y][x];
-    }
-    public boolean getBorder(int x,int y){
-        if(x<0 || y<0 || x>=width || y>=height)
-            throw new IllegalArgumentException();
-        return border[y][x];
     }
 
     public void setTerrain(int x,int y) throws AlreadyTrueException {
         if(x<0 || y<0 || x>=width || y>=height)
             throw new IllegalArgumentException();
-        if(terrain[y][x])
+        if(terrain[y][x]==Place.FLOOR)
             throw new AlreadyTrueException();
-        terrain[y][x]=true;
+        terrain[y][x]=Place.FLOOR;
     }
 
     public void resize(int maxX,int minX,int maxY,int minY){
@@ -62,12 +61,12 @@ public class Map {
             xMargin=(yLen-xLen)/2+margin;
         }
         //Cutting height
-        boolean[][] newTerrain=new boolean[yLen+2*yMargin][width];
+        Place[][] newTerrain=new Place[yLen+2*yMargin][width];
         System.arraycopy(terrain,minY,newTerrain,yMargin,yLen);
         //Saving changes
         terrain=newTerrain;
         //Cutting width
-        newTerrain=new boolean[yLen+2*yMargin][xLen+2*xMargin];
+        newTerrain=new Place[yLen+2*yMargin][xLen+2*xMargin];
         for (int i=0;i< newTerrain.length;i++) {
             System.arraycopy(terrain[i],minX,newTerrain[i],xMargin,xLen);
         }
@@ -75,16 +74,14 @@ public class Map {
         terrain=newTerrain;
         width=xLen+2*xMargin;
         height=yLen+2*yMargin;
-        border=new boolean[height][width];
         image=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
     }
 
     public void drawBorder(){
-        border=new boolean[height][width];
         for(int y=1;y<height-1;y++){
             for(int x=1;x<width-1;x++){
-                if((terrain[y][x-1] ||terrain[y][x+1] ||terrain[y-1][x] ||terrain[y+1][x]) && !terrain[y][x] ){
-                    border[y][x]=true;
+                if((terrain[y][x-1]==Place.FLOOR ||terrain[y][x+1]==Place.FLOOR ||terrain[y-1][x]==Place.FLOOR ||terrain[y+1][x]==Place.FLOOR) && terrain[y][x]!=Place.FLOOR ){
+                    terrain[y][x]=Place.WALL;
                 }
             }
         }
