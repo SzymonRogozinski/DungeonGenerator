@@ -146,6 +146,18 @@ public class MainPanel extends JPanel {
     public synchronized void drawMapBorder(){
         if(state.isResized()){
             map.drawBorder();
+            state.borderDrew();
+            resetScreen();
+        }
+    }
+
+    public synchronized void drawTreasure(){
+        if(state.isBordered()){
+            try {
+                map.drawTreasure(10);
+            }catch (Exception e){
+                System.err.println(e.getMessage());
+            }
             resetScreen();
         }
     }
@@ -158,6 +170,7 @@ public class MainPanel extends JPanel {
         private boolean working;
         private boolean stopped;    //Can be true only while working is true
         private boolean resized;    //Only after work was ended
+        private boolean bordered;
 
         public boolean isWorking(){
             return working;
@@ -204,17 +217,23 @@ public class MainPanel extends JPanel {
             return stopped;
         }
 
+        public boolean isBordered(){return bordered;}
+        public void borderDrew(){
+            bordered=true;
+        }
+
         public void restartState(){
             working=false;
             stopped=false;
             resized=false;
+            bordered=false;
         }
 
     }
 
     private class ControlPanel extends JPanel {
 
-        private final JButton start,stop,next,restart,save,speedUp,resize,border;
+        private final JButton start,stop,next,restart,save,speedUp,resize,border, treasure;
         private final JRadioButton firstAlg,secondAlg,thirdAlg;
         private final ButtonGroup algorithmChose;
         private final JTextField size_of_map,numberOfElements,seed;
@@ -277,6 +296,11 @@ public class MainPanel extends JPanel {
             border.setBounds(buttonSize+buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
             border.addActionListener(e->drawMapBorder());
 
+            treasure=new JButton(new ImageIcon("Menu_Buttons/open-chest.png"));
+            treasure.setEnabled(true);
+            treasure.setBounds(2*buttonSize+buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
+            treasure.addActionListener(e->drawTreasure());
+
             //Radio Buttons
             firstAlg=new JRadioButton("Mrówki");
             firstAlg.setBounds(buttonShift,3*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
@@ -331,6 +355,7 @@ public class MainPanel extends JPanel {
             this.add(speedUp);
             this.add(resize);
             this.add(border);
+            this.add(treasure);
             this.add(firstAlg);
             this.add(secondAlg);
             this.add(thirdAlg);
@@ -363,6 +388,7 @@ public class MainPanel extends JPanel {
             mapGraphics.setColor(Color.BLACK);
             mapGraphics.fillRect(0,0,map.getWidth(),map.getHeight());
             mapGraphics.setColor(Color.WHITE);
+            //Floor
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
                     if(map.getTerrain(j,i)==Place.FLOOR) {
@@ -370,10 +396,20 @@ public class MainPanel extends JPanel {
                     }
                 }
             }
+            //Walls
             mapGraphics.setColor(Color.RED);
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
                     if(map.getTerrain(j,i)==Place.WALL) {
+                        mapGraphics.fillRect(j, i, 1, 1);
+                    }
+                }
+            }
+            //Treasure
+            mapGraphics.setColor(Color.BLUE);
+            for(int i=0;i<map.getHeight();i++){
+                for(int j=0;j<map.getWidth();j++){
+                    if(map.getTerrain(j,i)==Place.TREASURE) {
                         mapGraphics.fillRect(j, i, 1, 1);
                     }
                 }

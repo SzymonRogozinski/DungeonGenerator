@@ -3,5 +3,6 @@ package com.company;
 public enum Place {
     VOID,
     WALL,
-    FLOOR
+    FLOOR,
+    TREASURE
 }
