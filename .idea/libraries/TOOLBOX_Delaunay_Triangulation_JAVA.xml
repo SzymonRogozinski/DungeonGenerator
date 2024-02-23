@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="TOOLBOX_Delaunay_Triangulation_JAVA">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/TOOLBOX_Delaunay_Triangulation_JAVA.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

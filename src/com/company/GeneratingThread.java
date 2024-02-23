@@ -22,7 +22,7 @@ public class GeneratingThread extends Thread{
         }else if(algType==2){
             genAlg=new TunelAntAlgorithm();
         }else if(algType==3){
-
+            genAlg=new WebOfRoomsAlgorithm();
         }
         genAlg.setStart(limit, random,reference,dense);
     }
@@ -36,7 +36,7 @@ public class GeneratingThread extends Thread{
         }else if(algType==2){
             genAlg=new TunelAntAlgorithm();
         }else if(algType==3){
-
+            genAlg=new WebOfRoomsAlgorithm();
         }
         genAlg.setStart(limit,random,reference,dense);
 

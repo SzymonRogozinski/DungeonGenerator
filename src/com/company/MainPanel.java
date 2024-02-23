@@ -302,16 +302,16 @@ public class MainPanel extends JPanel {
             treasure.addActionListener(e->drawTreasure());
 
             //Radio Buttons
-            firstAlg=new JRadioButton("Mrówki");
+            firstAlg=new JRadioButton("Jaskinia");
             firstAlg.setBounds(buttonShift,3*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
             firstAlg.addActionListener(e->algorithmType=1);
             firstAlg.setSelected(true);
 
-            secondAlg=new JRadioButton("Tunele");
+            secondAlg=new JRadioButton("Kopalnia");
             secondAlg.setBounds(buttonShift,3*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
             secondAlg.addActionListener(e->algorithmType=2);
 
-            thirdAlg=new JRadioButton("<<placeholder>>");
+            thirdAlg=new JRadioButton("Loch");
             thirdAlg.setBounds(buttonShift,3*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
             thirdAlg.addActionListener(e->algorithmType=3);
 
