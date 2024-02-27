@@ -1,5 +1,6 @@
 package com.company;
 
+import java.rmi.UnexpectedException;
 import java.util.Random;
 
 public class GeneratingThread extends Thread{
@@ -24,7 +25,11 @@ public class GeneratingThread extends Thread{
         }else if(algType==3){
             genAlg=new WebOfRoomsAlgorithm();
         }
-        genAlg.setStart(limit, random,reference,dense);
+        try {
+            genAlg.setStart(limit, random,reference,dense);
+        }catch (UnexpectedException e){
+            System.exit(-1);
+        }
     }
 
     public GeneratingThread(int limit, Map reference, MainPanel panel, int algType, int seed) {
@@ -38,7 +43,11 @@ public class GeneratingThread extends Thread{
         }else if(algType==3){
             genAlg=new WebOfRoomsAlgorithm();
         }
-        genAlg.setStart(limit,random,reference,dense);
+        try {
+            genAlg.setStart(limit, random, reference, dense);
+        }catch (UnexpectedException e){
+            System.exit(-1);
+        }
 
     }
 
