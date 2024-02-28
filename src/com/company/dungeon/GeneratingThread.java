@@ -1,4 +1,10 @@
-package com.company;
+package com.company.dungeon;
+
+import com.company.*;
+import com.company.dungeon.algorithm.GeneratingAlgorithm;
+import com.company.dungeon.algorithm.SimpleAntAlgorithm;
+import com.company.dungeon.algorithm.TunelAntAlgorithm;
+import com.company.dungeon.algorithm.WebOfRoomsAlgorithm;
 
 import java.rmi.UnexpectedException;
 import java.util.Random;

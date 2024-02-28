@@ -1,5 +1,7 @@
-package com.company;
+package com.company.dungeon.algorithm;
 
+import com.company.dungeon.Map;
+import com.company.dungeon.algorithm.GeneratingAlgorithm;
 import delaunay.BowyerWatson;
 import mst.Kruskal;
 import structure.DEdge;
@@ -11,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 
-public class WebOfRoomsAlgorithm implements GeneratingAlgorithm{
+public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     //State
     private boolean roomGenerated;
     private ArrayList<Rectangle> roomList;
@@ -39,7 +41,7 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm{
         int marginSpace=reference.getHeight()* reference.getWidth()-(reference.getHeight()-(2*maxSize))* (reference.getWidth()-(2*maxSize));
         int drawingSpace=reference.getHeight()* reference.getWidth()-marginSpace/2;
 
-        if(limit*2>drawingSpace){
+        if(limit*1.8>drawingSpace){
             throw new UnexpectedException("Margin space is too large!");
         }
     }
@@ -109,7 +111,6 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm{
                 additionalEdges--;
             }
         }
-
         return new ArrayList<>(edges);
     }
 

@@ -1,4 +1,4 @@
-package com.company;
+package com.company.dungeon;
 
 public class Ant {
     private final int x,y;

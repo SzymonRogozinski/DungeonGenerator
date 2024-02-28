@@ -1,5 +1,9 @@
 package com.company;
 
+import com.company.dungeon.GeneratingThread;
+import com.company.dungeon.Map;
+import com.company.dungeon.MapTransformation;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -145,19 +149,43 @@ public class MainPanel extends JPanel {
 
     public synchronized void drawMapBorder(){
         if(state.isResized()){
-            map.drawBorder();
+            MapTransformation.drawBorder(map);
+            //map.drawBorder();
             state.borderDrew();
             resetScreen();
         }
     }
 
+    public synchronized void drawEntries(){
+        if(state.isBordered() && !state.entries){
+            MapTransformation.drawEntries(map);
+            //map.drawEntries();
+            state.entriesDrew();
+            resetScreen();
+        }
+    }
+
     public synchronized void drawTreasure(){
-        if(state.isBordered()){
+        if(state.isEntriesDrew() && state.isBordered()){
             try {
-                map.drawTreasure(10);
+                MapTransformation.drawTreasure(10,map);
+                //map.drawTreasure(10);
             }catch (Exception e){
                 System.err.println(e.getMessage());
             }
+            resetScreen();
+        }
+    }
+
+    public synchronized void drawEnemies(){
+        if(state.isEntriesDrew()){
+            try {
+                MapTransformation.drawEnemies(20,map);
+                //map.drawEnemies(20);
+            }catch (Exception e){
+                System.err.println(e.getMessage());
+            }
+            state.borderDrew();
             resetScreen();
         }
     }
@@ -171,6 +199,8 @@ public class MainPanel extends JPanel {
         private boolean stopped;    //Can be true only while working is true
         private boolean resized;    //Only after work was ended
         private boolean bordered;
+
+        private boolean entries;
 
         public boolean isWorking(){
             return working;
@@ -222,18 +252,27 @@ public class MainPanel extends JPanel {
             bordered=true;
         }
 
+        public boolean isEntriesDrew(){
+            return entries;
+        }
+
+        public void entriesDrew(){
+            entries=true;
+        }
+
         public void restartState(){
             working=false;
             stopped=false;
             resized=false;
             bordered=false;
+            entries=false;
         }
 
     }
 
     private class ControlPanel extends JPanel {
 
-        private final JButton start,stop,next,restart,save,speedUp,resize,border, treasure;
+        private final JButton start,stop,next,restart,save,speedUp,resize,border,entries,treasure,enemies;
         private final JRadioButton firstAlg,secondAlg,thirdAlg;
         private final ButtonGroup algorithmChose;
         private final JTextField size_of_map,numberOfElements,seed;
@@ -283,7 +322,6 @@ public class MainPanel extends JPanel {
 
             speedUp=new JButton(new ImageIcon("Menu_Buttons/fast-forward-button.png"));
             speedUp.setBounds(2*buttonSize+buttonShift,buttonSize+buttonShift,buttonSize,buttonSize);
-            //speedUp.addActionListener(e-> genereate.changeDelay());
             speedUp.addActionListener(e-> speedUpGenerate());
 
             resize=new JButton(new ImageIcon("Menu_Buttons/contract.png"));
@@ -296,23 +334,33 @@ public class MainPanel extends JPanel {
             border.setBounds(buttonSize+buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
             border.addActionListener(e->drawMapBorder());
 
+            entries=new JButton(new ImageIcon("Menu_Buttons/wooden-door.png"));
+            entries.setEnabled(true);
+            entries.setBounds(2*buttonSize+buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
+            entries.addActionListener(e->drawEntries());
+
             treasure=new JButton(new ImageIcon("Menu_Buttons/open-chest.png"));
             treasure.setEnabled(true);
-            treasure.setBounds(2*buttonSize+buttonShift,2*buttonSize+buttonShift,buttonSize,buttonSize);
+            treasure.setBounds(buttonShift,3*buttonSize+buttonShift,buttonSize,buttonSize);
             treasure.addActionListener(e->drawTreasure());
+
+            enemies=new JButton(new ImageIcon("Menu_Buttons/bully-minion.png"));
+            enemies.setEnabled(true);
+            enemies.setBounds(buttonSize+buttonShift,3*buttonSize+buttonShift,buttonSize,buttonSize);
+            enemies.addActionListener(e->drawEnemies());
 
             //Radio Buttons
             firstAlg=new JRadioButton("Jaskinia");
-            firstAlg.setBounds(buttonShift,3*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
+            firstAlg.setBounds(buttonShift,4*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
             firstAlg.addActionListener(e->algorithmType=1);
             firstAlg.setSelected(true);
 
             secondAlg=new JRadioButton("Kopalnia");
-            secondAlg.setBounds(buttonShift,3*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
+            secondAlg.setBounds(buttonShift,4*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
             secondAlg.addActionListener(e->algorithmType=2);
 
             thirdAlg=new JRadioButton("Loch");
-            thirdAlg.setBounds(buttonShift,3*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
+            thirdAlg.setBounds(buttonShift,4*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
             thirdAlg.addActionListener(e->algorithmType=3);
 
             algorithmChose=new ButtonGroup();
@@ -321,30 +369,30 @@ public class MainPanel extends JPanel {
             algorithmChose.add(thirdAlg);
 
             textOfSize=new JLabel("Size of map");
-            textOfSize.setBounds(textfieldShift,(int)(5.5*textfieldSpacing),textfieldWidth,textfieldHeight);
+            textOfSize.setBounds(textfieldShift,(int)(6.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSize.setHorizontalAlignment(JLabel.CENTER);
             textOfSize.setForeground(Color.WHITE);
 
             size_of_map =new JTextField("100");
-            size_of_map.setBounds(textfieldShift,6*textfieldSpacing,textfieldWidth,textfieldHeight);
+            size_of_map.setBounds(textfieldShift,(int)7*textfieldSpacing,textfieldWidth,textfieldHeight);
             size_of_map.setHorizontalAlignment(JTextField.CENTER);
 
             textOfNumber=new JLabel("Size of dungeon");
-            textOfNumber.setBounds(textfieldShift,(int)(6.5*textfieldSpacing),textfieldWidth,textfieldHeight);
+            textOfNumber.setBounds(textfieldShift,(int)(7.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfNumber.setHorizontalAlignment(JLabel.CENTER);
             textOfNumber.setForeground(Color.WHITE);
 
             numberOfElements=new JTextField("1000");
-            numberOfElements.setBounds(textfieldShift,7*textfieldSpacing,textfieldWidth,textfieldHeight);
+            numberOfElements.setBounds(textfieldShift,8*textfieldSpacing,textfieldWidth,textfieldHeight);
             numberOfElements.setHorizontalAlignment(JTextField.CENTER);
 
             textOfSeed=new JLabel("Seed");
-            textOfSeed.setBounds(textfieldShift,(int)(7.5*textfieldSpacing),textfieldWidth,textfieldHeight);
+            textOfSeed.setBounds(textfieldShift,(int)(8.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSeed.setHorizontalAlignment(JLabel.CENTER);
             textOfSeed.setForeground(Color.WHITE);
 
             seed=new JTextField();
-            seed.setBounds(textfieldShift,8*textfieldSpacing,textfieldWidth,textfieldHeight);
+            seed.setBounds(textfieldShift,9*textfieldSpacing,textfieldWidth,textfieldHeight);
             seed.setHorizontalAlignment(JTextField.CENTER);
 
             this.add(start);
@@ -355,7 +403,9 @@ public class MainPanel extends JPanel {
             this.add(speedUp);
             this.add(resize);
             this.add(border);
+            this.add(entries);
             this.add(treasure);
+            this.add(enemies);
             this.add(firstAlg);
             this.add(secondAlg);
             this.add(thirdAlg);
@@ -385,33 +435,19 @@ public class MainPanel extends JPanel {
                 return;
             }
             Graphics2D mapGraphics=map.getImage().createGraphics();
-            mapGraphics.setColor(Color.BLACK);
-            mapGraphics.fillRect(0,0,map.getWidth(),map.getHeight());
-            mapGraphics.setColor(Color.WHITE);
-            //Floor
+
+            //Drawing
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
-                    if(map.getTerrain(j,i)==Place.FLOOR) {
-                        mapGraphics.fillRect(j, i, 1, 1);
+                    switch (map.getTerrain(j,i)){
+                        case null,VOID -> mapGraphics.setColor(Color.BLACK);
+                        case FLOOR -> mapGraphics.setColor(Color.WHITE);
+                        case WALL -> mapGraphics.setColor(Color.GRAY);
+                        case ENTRIES -> mapGraphics.setColor(Color.ORANGE);
+                        case TREASURE -> mapGraphics.setColor(Color.BLUE);
+                        case ENEMY -> mapGraphics.setColor(Color.RED);
                     }
-                }
-            }
-            //Walls
-            mapGraphics.setColor(Color.RED);
-            for(int i=0;i<map.getHeight();i++){
-                for(int j=0;j<map.getWidth();j++){
-                    if(map.getTerrain(j,i)==Place.WALL) {
-                        mapGraphics.fillRect(j, i, 1, 1);
-                    }
-                }
-            }
-            //Treasure
-            mapGraphics.setColor(Color.BLUE);
-            for(int i=0;i<map.getHeight();i++){
-                for(int j=0;j<map.getWidth();j++){
-                    if(map.getTerrain(j,i)==Place.TREASURE) {
-                        mapGraphics.fillRect(j, i, 1, 1);
-                    }
+                    mapGraphics.fillRect(j, i, 1, 1);
                 }
             }
             mapGraphics.dispose();

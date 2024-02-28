@@ -1,10 +1,15 @@
-package com.company;
+package com.company.dungeon.algorithm;
+
+import com.company.dungeon.Ant;
+import com.company.dungeon.Map;
+import com.company.dungeon.Place;
+import com.company.dungeon.algorithm.GeneratingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
-public class SimpleAntAlgorithm implements GeneratingAlgorithm{
+public class SimpleAntAlgorithm implements GeneratingAlgorithm {
 
     private int limit;
     private Stack<Ant> stack;
@@ -80,7 +85,7 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm{
     private ArrayList<Ant> howManyNeighbour(Ant p,Map reference){
         ArrayList<Ant> n=new ArrayList<>();
         //Góra
-        if(p.getY()>0 && reference.getTerrain(p.getX(),p.getY()-1)!=Place.FLOOR){
+        if(p.getY()>0 && reference.getTerrain(p.getX(),p.getY()-1)!= Place.FLOOR){
             n.add(new Ant(p.getX(),p.getY()-1));
         }
         //Lewo

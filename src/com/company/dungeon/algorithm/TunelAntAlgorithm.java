@@ -1,10 +1,14 @@
-package com.company;
+package com.company.dungeon.algorithm;
 
-import java.util.ArrayList;
+import com.company.dungeon.Ant;
+import com.company.dungeon.Map;
+import com.company.dungeon.SmartAnt;
+import com.company.dungeon.algorithm.GeneratingAlgorithm;
+
 import java.util.Random;
 import java.util.Stack;
 
-public class TunelAntAlgorithm implements GeneratingAlgorithm{
+public class TunelAntAlgorithm implements GeneratingAlgorithm {
 
     private int limit;
     private Stack<SmartAnt> stack;

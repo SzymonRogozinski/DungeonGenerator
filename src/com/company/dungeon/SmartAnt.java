@@ -1,9 +1,9 @@
-package com.company;
+package com.company.dungeon;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SmartAnt extends Ant{
+public class SmartAnt extends Ant {
 
     private int counter;
     private Direction dir;
@@ -77,7 +77,7 @@ public class SmartAnt extends Ant{
 
         public boolean checkNextAnt(SmartAnt ant, Map map){
             try{
-                return map.getTerrain(ant.getX()+dx,ant.getY()+dy)==Place.FLOOR;
+                return map.getTerrain(ant.getX()+dx,ant.getY()+dy)== Place.FLOOR;
             }catch(IllegalArgumentException e){
                 return true;
             }
