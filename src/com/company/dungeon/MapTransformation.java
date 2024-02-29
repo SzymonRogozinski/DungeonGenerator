@@ -9,6 +9,7 @@ public class MapTransformation {
     private final static int margin=3;
     private final static int trials=3;
     private final static int doorRange=7;
+    private final static double entriesRange=0.7;
     private final static  Random random=new Random();
 
 
@@ -33,7 +34,7 @@ public class MapTransformation {
                     possibleLocation.add(new Coordinate(x,y));
             }
         }
-        int range=(int)(0.7 * map.getWidth());
+        int range=(int)(entriesRange * map.getWidth());
         int count=trials;
         while(true){
             Coordinate entry=possibleLocation.get(random.nextInt(possibleLocation.size()));

@@ -11,7 +11,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        JFrame frame=new JFrame("Generator lochu");
+        JFrame frame=new JFrame("Dungeon generator");
         JPanel mainPanel=new MainPanel();
 
         frame.setSize(new Dimension(MAX_SIZE,MAX_SIZE));

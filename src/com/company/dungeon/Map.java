@@ -1,10 +1,7 @@
 package com.company.dungeon;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
-import java.util.Stack;
 
 public class Map {
     private int width,height;

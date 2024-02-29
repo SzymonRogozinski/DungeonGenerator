@@ -1,9 +1,7 @@
 package com.company.dungeon.algorithm;
 
-import com.company.dungeon.Ant;
 import com.company.dungeon.Map;
 import com.company.dungeon.Place;
-import com.company.dungeon.algorithm.GeneratingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -51,9 +49,9 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm {
                 continue;
             }
             limit--;
-            //Sprawdzenie ile sąsiadów
+            //Check how many neighbours
             ArrayList<Ant> neighbour = howManyNeighbour(stack.pop(),reference);
-            //Dorzucenie do nowego stosu
+            //Add to new stack
             if(neighbour.size()==0){
             }else if (neighbour.size() < 3 || random.nextDouble()>dense) {
                 Ant nextAnt=neighbour.get(random.nextInt(neighbour.size()));
@@ -84,19 +82,19 @@ public class SimpleAntAlgorithm implements GeneratingAlgorithm {
 
     private ArrayList<Ant> howManyNeighbour(Ant p,Map reference){
         ArrayList<Ant> n=new ArrayList<>();
-        //Góra
+        //Up
         if(p.getY()>0 && reference.getTerrain(p.getX(),p.getY()-1)!= Place.FLOOR){
             n.add(new Ant(p.getX(),p.getY()-1));
         }
-        //Lewo
+        //Left
         if(p.getX()>0 && reference.getTerrain(p.getX()-1,p.getY())!=Place.FLOOR){
             n.add(new Ant(p.getX()-1,p.getY()));
         }
-        //Prawo
+        //Right
         if(p.getX()<reference.getWidth()-1 && reference.getTerrain(p.getX()+1,p.getY())!=Place.FLOOR){
             n.add(new Ant(p.getX()+1,p.getY()));
         }
-        //Dół
+        //Down
         if(p.getY()< reference.getHeight()-1 && reference.getTerrain(p.getX(),p.getY()+1)!=Place.FLOOR) {
             n.add(new Ant(p.getX(), p.getY() + 1));
         }

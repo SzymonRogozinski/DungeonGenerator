@@ -1,6 +1,5 @@
 package com.company;
 
-import com.company.dungeon.GeneratingThread;
 import com.company.dungeon.Map;
 import com.company.dungeon.MapTransformation;
 
@@ -118,18 +117,18 @@ public class MainPanel extends JPanel {
     public synchronized void save() {
         if(!genereate.isAlive()){
             try {
-                //Przeskalowanie
+                //Rescale
                 Image tmp = map.getImage().getScaledInstance(Main.DRAW_SIZE, Main.DRAW_SIZE, Image.SCALE_SMOOTH);
                 BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_BYTE_BINARY);
                 Graphics2D g2d = dimg.createGraphics();
                 g2d.drawImage(tmp, 0, 0, null);
                 g2d.dispose();
-                //Zapis
-                ImageIO.write(dimg, "png", new File("mapka.png"));
+                //Save
+                ImageIO.write(dimg, "png", new File("map.png"));
             }catch (IOException ignore){}
         }
         else{
-            System.err.println("Mapa nie została jeszcze wygenerowana!!!");
+            System.err.println("Map was not fully generated!");
         }
     }
 
@@ -150,7 +149,6 @@ public class MainPanel extends JPanel {
     public synchronized void drawMapBorder(){
         if(state.isResized()){
             MapTransformation.drawBorder(map);
-            //map.drawBorder();
             state.borderDrew();
             resetScreen();
         }
@@ -159,7 +157,6 @@ public class MainPanel extends JPanel {
     public synchronized void drawEntries(){
         if(state.isBordered() && !state.entries){
             MapTransformation.drawEntries(map);
-            //map.drawEntries();
             state.entriesDrew();
             resetScreen();
         }
@@ -169,7 +166,6 @@ public class MainPanel extends JPanel {
         if(state.isEntriesDrew() && state.isBordered()){
             try {
                 MapTransformation.drawTreasure(10,map);
-                //map.drawTreasure(10);
             }catch (Exception e){
                 System.err.println(e.getMessage());
             }
@@ -181,7 +177,6 @@ public class MainPanel extends JPanel {
         if(state.isEntriesDrew()){
             try {
                 MapTransformation.drawEnemies(20,map);
-                //map.drawEnemies(20);
             }catch (Exception e){
                 System.err.println(e.getMessage());
             }
@@ -202,17 +197,11 @@ public class MainPanel extends JPanel {
 
         private boolean entries;
 
-        public boolean isWorking(){
-            return working;
-        }
 
         public void startWork(){
             working=true;
         }
 
-        public void endWork(){
-            working=false;
-        }
 
         public void GenerateEnd(){
             working=false;
@@ -350,16 +339,16 @@ public class MainPanel extends JPanel {
             enemies.addActionListener(e->drawEnemies());
 
             //Radio Buttons
-            firstAlg=new JRadioButton("Jaskinia");
+            firstAlg=new JRadioButton("Cave");
             firstAlg.setBounds(buttonShift,4*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
             firstAlg.addActionListener(e->algorithmType=1);
             firstAlg.setSelected(true);
 
-            secondAlg=new JRadioButton("Kopalnia");
+            secondAlg=new JRadioButton("Mine");
             secondAlg.setBounds(buttonShift,4*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
             secondAlg.addActionListener(e->algorithmType=2);
 
-            thirdAlg=new JRadioButton("Loch");
+            thirdAlg=new JRadioButton("Dungeon");
             thirdAlg.setBounds(buttonShift,4*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
             thirdAlg.addActionListener(e->algorithmType=3);
 

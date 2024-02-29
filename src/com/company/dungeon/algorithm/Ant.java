@@ -1,4 +1,4 @@
-package com.company.dungeon;
+package com.company.dungeon.algorithm;
 
 public class Ant {
     private final int x,y;

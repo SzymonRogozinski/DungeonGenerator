@@ -1,4 +1,7 @@
-package com.company.dungeon;
+package com.company.dungeon.algorithm;
+
+import com.company.dungeon.Map;
+import com.company.dungeon.Place;
 
 import java.util.ArrayList;
 import java.util.Random;

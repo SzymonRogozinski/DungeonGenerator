@@ -1,7 +1,6 @@
 package com.company.dungeon.algorithm;
 
 import com.company.dungeon.Map;
-import com.company.dungeon.algorithm.GeneratingAlgorithm;
 import delaunay.BowyerWatson;
 import mst.Kruskal;
 import structure.DEdge;
@@ -10,6 +9,7 @@ import structure.DPoint;
 import java.awt.*;
 import java.rmi.UnexpectedException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -18,6 +18,7 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     private boolean roomGenerated;
     private ArrayList<Rectangle> roomList;
     private ArrayList<Rectangle> roomWithMarginList;
+    private HashMap<DPoint,Rectangle> roomCenters;
     private int limit;
     private Random random;
     private Map reference;
@@ -41,7 +42,7 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
         int marginSpace=reference.getHeight()* reference.getWidth()-(reference.getHeight()-(2*maxSize))* (reference.getWidth()-(2*maxSize));
         int drawingSpace=reference.getHeight()* reference.getWidth()-marginSpace/2;
 
-        if(limit*1.8>drawingSpace){
+        if(limit*1.25>drawingSpace){
             throw new UnexpectedException("Margin space is too large!");
         }
     }
@@ -57,8 +58,10 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
         if(limit<0){
             //Seeking for corridors
             ArrayList<DPoint> centres=new ArrayList<>();
+            roomCenters=new HashMap<>();
             for (Rectangle room:roomList) {
                 DPoint p=new DPoint((int) room.getCenterX(), (int) room.getCenterY());
+                roomCenters.put(p,room);
                 centres.add(p);
             }
             ArrayList<DEdge> corridors=DelaunayTriangulation(centres, reference.getWidth(), reference.getHeight());
@@ -115,11 +118,42 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     }
 
     private void drawCorridor(DEdge edge) {
+        DPoint start=edge.p[0];
+        DPoint end=edge.p[1];
+        //Move point to wall
+        double DX=end.x-start.x;
+        double DY=end.y-start.y;
+        if(Math.abs(DX)>=Math.abs(DY)){
+            if(DX>=0){
+                start.x=roomCenters.get(start).getMaxX();
+                start.y=roomCenters.get(start).getCenterY();
+                end.x=roomCenters.get(end).getMinX();
+                end.y=roomCenters.get(end).getCenterY();
+            }else{
+                start.x=roomCenters.get(start).getMinX();
+                start.y=roomCenters.get(start).getCenterY();
+                end.x=roomCenters.get(end).getMaxX();
+                end.y=roomCenters.get(end).getCenterY();
+            }
+        }else{
+            if(DY>=0){
+                start.y=roomCenters.get(start).getMaxY();
+                start.x=roomCenters.get(start).getCenterX();
+                end.y=roomCenters.get(end).getMinY();
+                end.x=roomCenters.get(end).getCenterX();
+            }else{
+                start.y=roomCenters.get(start).getMinY();
+                start.x=roomCenters.get(start).getCenterX();
+                end.y=roomCenters.get(end).getMaxY();
+                end.x=roomCenters.get(end).getCenterX();
+            }
+        }
+
         //Bresenham's line algorithm
-        int startX=(int)edge.p[0].x;
-        int startY=(int)edge.p[0].y;
-        int endX=(int)edge.p[1].x;
-        int endY=(int)edge.p[1].y;
+        int startX=(int)start.x;
+        int startY=(int)start.y;
+        int endX=(int)end.x;
+        int endY=(int)end.y;
 
         int dx=endX-startX;
         int dy=endY-startY;

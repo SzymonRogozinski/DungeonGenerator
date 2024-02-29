@@ -1,6 +1,6 @@
-package com.company.dungeon;
+package com.company;
 
-import com.company.*;
+import com.company.dungeon.Map;
 import com.company.dungeon.algorithm.GeneratingAlgorithm;
 import com.company.dungeon.algorithm.SimpleAntAlgorithm;
 import com.company.dungeon.algorithm.TunelAntAlgorithm;
@@ -95,7 +95,7 @@ public class GeneratingThread extends Thread{
             }
         }while (genAlg.getLimit()>0 && !isEmpty);
         if(genAlg.getLimit()>0)
-            System.err.println("Nie wygenerowano pełnego lochu!");
+            System.err.println("Dungeon was not fully generated!");
     }
 
 }
