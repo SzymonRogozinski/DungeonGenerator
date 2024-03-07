@@ -8,10 +8,7 @@ import structure.DPoint;
 
 import java.awt.*;
 import java.rmi.UnexpectedException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     //State
@@ -125,27 +122,39 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
         double DY=end.y-start.y;
         if(Math.abs(DX)>=Math.abs(DY)){
             if(DX>=0){
-                start.x=roomCenters.get(start).getMaxX();
-                start.y=roomCenters.get(start).getCenterY();
-                end.x=roomCenters.get(end).getMinX();
-                end.y=roomCenters.get(end).getCenterY();
+                start.x = roomCenters.get(start).getMaxX();
+                end.x = roomCenters.get(end).getMinX();
             }else{
-                start.x=roomCenters.get(start).getMinX();
-                start.y=roomCenters.get(start).getCenterY();
-                end.x=roomCenters.get(end).getMaxX();
-                end.y=roomCenters.get(end).getCenterY();
+                start.x = roomCenters.get(start).getMinX();
+                end.x = roomCenters.get(end).getMaxX();
+            }
+            //Make straight line if possible
+            int [] straightPoint=makeStraightLine((int)roomCenters.get(start).getMinY(),(int)roomCenters.get(start).getMaxY(),(int)roomCenters.get(end).getMinY(),(int)roomCenters.get(end).getMaxY());
+            if(straightPoint==null){
+                start.y = roomCenters.get(start).getCenterY();
+                end.y = roomCenters.get(end).getCenterY();
+            }else{
+                int r=random.nextInt(straightPoint[0],straightPoint[1]);
+                start.y = r;
+                end.y = r;
             }
         }else{
             if(DY>=0){
-                start.y=roomCenters.get(start).getMaxY();
-                start.x=roomCenters.get(start).getCenterX();
-                end.y=roomCenters.get(end).getMinY();
-                end.x=roomCenters.get(end).getCenterX();
+                start.y = roomCenters.get(start).getMaxY();
+                end.y = roomCenters.get(end).getMinY();
             }else{
-                start.y=roomCenters.get(start).getMinY();
-                start.x=roomCenters.get(start).getCenterX();
-                end.y=roomCenters.get(end).getMaxY();
-                end.x=roomCenters.get(end).getCenterX();
+                start.y = roomCenters.get(start).getMinY();
+                end.y = roomCenters.get(end).getMaxY();
+            }
+            //Make straight line if possible
+            int [] straightPoint=makeStraightLine((int)roomCenters.get(start).getMinX(),(int)roomCenters.get(start).getMaxX(),(int)roomCenters.get(end).getMinX(),(int)roomCenters.get(end).getMaxX());
+            if(straightPoint==null){
+                start.x = roomCenters.get(start).getCenterX();
+                end.x = roomCenters.get(end).getCenterX();
+            }else{
+                int r=random.nextInt(straightPoint[0],straightPoint[1]);
+                start.x = r;
+                end.x = r;
             }
         }
 
@@ -171,6 +180,16 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
                 plotLineHigh(startX,startY,endX,endY);
             }
         }
+    }
+
+    private int[] makeStraightLine(int a,int b,int c,int d){
+        int[] sorted= {a, b, c, d};
+        Arrays.sort(sorted);
+        //Check intersection
+        if((sorted[0]==a && sorted[1]==b)||(sorted[2]==a && sorted[3]==b)){
+            return null;
+        }
+        return new int[]{sorted[1],sorted[2]};
     }
 
     //y loop
