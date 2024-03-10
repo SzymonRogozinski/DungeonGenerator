@@ -151,7 +151,7 @@ public class MapTransformation {
         //Do it until there is no more location or key and treasures is not deployed
         ArrayList<Coordinate> keyCoordinates= new ArrayList<>(entrySideCoordinates.values());
         while(!keyCoordinates.isEmpty() && keyCount>0){
-            Coordinate c=keyCoordinates.get(random.nextInt(entrySideCoordinates.size()));
+            Coordinate c=keyCoordinates.get(random.nextInt(keyCoordinates.size()));
             map.setTerrain(c.x,c.y,Place.KEY);
             keyCount--;
             keyCoordinates.remove(c);
@@ -340,7 +340,7 @@ public class MapTransformation {
         //Check if something is in neighbourhood
         int[][] positionToCheck={{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};
         for(int[] mod:positionToCheck)
-            if(map.getTerrain(x+mod[1],y+mod[0])!=Place.FLOOR && map.getTerrain(x+mod[1],y+mod[0])!=Place.WALL)
+            if(map.getTerrain(x+mod[1],y+mod[0])!=Place.FLOOR && map.getTerrain(x+mod[1],y+mod[0])!=Place.WALL && map.getTerrain(x+mod[1],y+mod[0])!=Place.VOID)
                 return true;
         return false;
     }
