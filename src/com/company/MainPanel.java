@@ -185,6 +185,18 @@ public class MainPanel extends JPanel {
         }
     }
 
+    public synchronized void drawDoor(){
+        if(state.isEntriesDrew()){
+            try {
+                MapTransformation.drawDoorAndKey(map);
+            }catch (Exception e){
+                System.err.println(e.getMessage());
+            }
+            state.borderDrew();
+            resetScreen();
+        }
+    }
+
     public synchronized void algorithmEnded(){
         state.GenerateEnd();
     }
@@ -261,7 +273,7 @@ public class MainPanel extends JPanel {
 
     private class ControlPanel extends JPanel {
 
-        private final JButton start,stop,next,restart,save,speedUp,resize,border,entries,treasure,enemies;
+        private final JButton start,stop,next,restart,save,speedUp,resize,border,entries,treasure,enemies,doors;
         private final JRadioButton firstAlg,secondAlg,thirdAlg;
         private final ButtonGroup algorithmChose;
         private final JTextField size_of_map,numberOfElements,seed;
@@ -338,6 +350,11 @@ public class MainPanel extends JPanel {
             enemies.setBounds(buttonSize+buttonShift,3*buttonSize+buttonShift,buttonSize,buttonSize);
             enemies.addActionListener(e->drawEnemies());
 
+            doors=new JButton(new ImageIcon("Menu_Buttons/key.png"));
+            doors.setEnabled(true);
+            doors.setBounds(2*buttonSize+buttonShift,3*buttonSize+buttonShift,buttonSize,buttonSize);
+            doors.addActionListener(e->drawDoor());
+
             //Radio Buttons
             firstAlg=new JRadioButton("Cave");
             firstAlg.setBounds(buttonShift,4*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
@@ -395,6 +412,7 @@ public class MainPanel extends JPanel {
             this.add(entries);
             this.add(treasure);
             this.add(enemies);
+            this.add(doors);
             this.add(firstAlg);
             this.add(secondAlg);
             this.add(thirdAlg);
@@ -435,6 +453,8 @@ public class MainPanel extends JPanel {
                         case ENTRIES -> mapGraphics.setColor(Color.ORANGE);
                         case TREASURE -> mapGraphics.setColor(Color.BLUE);
                         case ENEMY -> mapGraphics.setColor(Color.RED);
+                        case KEY -> mapGraphics.setColor(Color.cyan);
+                        case DOOR -> mapGraphics.setColor(Color.YELLOW);
                     }
                     mapGraphics.fillRect(j, i, 1, 1);
                 }

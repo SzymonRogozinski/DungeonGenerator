@@ -6,12 +6,14 @@ import java.util.Arrays;
 public class Map {
     private int width,height;
     private Place[][] terrain;
-
+    //[0]->Enter, [1]->Exit
+    private Coordinate[] entries;
     private BufferedImage image;
 
     private final static int margin=3;
 
     public Map(int width, int height) {
+        this.entries=new Coordinate[2];
         this.width = width;
         this.height = height;
         terrain=new Place[height][width];
@@ -45,7 +47,7 @@ public class Map {
         terrain[y][x]=Place.FLOOR;
     }
 
-    public void setTerrain(int x,int y,Place place) throws AlreadyTrueException {
+    public void setTerrain(int x,int y,Place place) {
         if(x<0 || y<0 || x>=width || y>=height)
             throw new IllegalArgumentException();
         terrain[y][x]=place;
@@ -78,6 +80,15 @@ public class Map {
         width=xLen+2*xMargin;
         height=yLen+2*yMargin;
         image=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+    }
+
+    public void setEntries(Coordinate enter,Coordinate exit){
+        entries[0]=enter;
+        entries[1]=exit;
+    }
+
+    public Coordinate[] getEntries(){
+        return entries;
     }
 
     public static class AlreadyTrueException extends Exception{}

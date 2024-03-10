@@ -7,4 +7,6 @@ public enum Place {
     TREASURE,
     ENTRIES,
     ENEMY,
+    DOOR,
+    KEY,
 }
