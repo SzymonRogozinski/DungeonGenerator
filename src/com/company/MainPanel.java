@@ -16,7 +16,7 @@ public class MainPanel extends JPanel {
     private ControlPanel con;
     private Map map;
     private GeneratingThread genereate;
-    private int algorithmType=1;
+    private int algorithmType=3;//1;
 
     public GeneratingState state;
 
@@ -359,7 +359,6 @@ public class MainPanel extends JPanel {
             firstAlg=new JRadioButton("Cave");
             firstAlg.setBounds(buttonShift,4*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
             firstAlg.addActionListener(e->algorithmType=1);
-            firstAlg.setSelected(true);
 
             secondAlg=new JRadioButton("Mine");
             secondAlg.setBounds(buttonShift,4*buttonSize+buttonShift+radioButtonHeight,radioButtonWidth,radioButtonHeight);
@@ -368,11 +367,13 @@ public class MainPanel extends JPanel {
             thirdAlg=new JRadioButton("Dungeon");
             thirdAlg.setBounds(buttonShift,4*buttonSize+buttonShift+radioButtonHeight*2,radioButtonWidth,radioButtonHeight);
             thirdAlg.addActionListener(e->algorithmType=3);
+            thirdAlg.setSelected(true);
 
             algorithmChose=new ButtonGroup();
             algorithmChose.add(firstAlg);
             algorithmChose.add(secondAlg);
             algorithmChose.add(thirdAlg);
+
 
             textOfSize=new JLabel("Size of map");
             textOfSize.setBounds(textfieldShift,(int)(6.5*textfieldSpacing),textfieldWidth,textfieldHeight);
@@ -388,7 +389,7 @@ public class MainPanel extends JPanel {
             textOfNumber.setHorizontalAlignment(JLabel.CENTER);
             textOfNumber.setForeground(Color.WHITE);
 
-            numberOfElements=new JTextField("1000");
+            numberOfElements=new JTextField("3000");
             numberOfElements.setBounds(textfieldShift,8*textfieldSpacing,textfieldWidth,textfieldHeight);
             numberOfElements.setHorizontalAlignment(JTextField.CENTER);
 
@@ -397,7 +398,7 @@ public class MainPanel extends JPanel {
             textOfSeed.setHorizontalAlignment(JLabel.CENTER);
             textOfSeed.setForeground(Color.WHITE);
 
-            seed=new JTextField();
+            seed=new JTextField("1234");
             seed.setBounds(textfieldShift,9*textfieldSpacing,textfieldWidth,textfieldHeight);
             seed.setHorizontalAlignment(JTextField.CENTER);
 

@@ -6,6 +6,7 @@ import java.util.Arrays;
 public class Map {
     private int width,height;
     private Place[][] terrain;
+    private Place[][] terrainCopy;
     //[0]->Enter, [1]->Exit
     private Coordinate[] entries;
     private BufferedImage image;
@@ -51,6 +52,20 @@ public class Map {
         if(x<0 || y<0 || x>=width || y>=height)
             throw new IllegalArgumentException();
         terrain[y][x]=place;
+    }
+
+    public void makeCopy(){
+        terrainCopy=new Place[height][];
+        for(int i=0;i<height;i++){
+            terrainCopy[i]=Arrays.copyOf(terrain[i],width);
+        }
+    }
+
+    public void backToCopy(){
+        if(terrainCopy!=null) {
+            terrain = terrainCopy;
+            terrainCopy = null;
+        }
     }
 
     public void resize(int maxX,int minX,int maxY,int minY){

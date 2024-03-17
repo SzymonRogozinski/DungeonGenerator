@@ -8,6 +8,10 @@ public class MapTransformation {
     private final static int trials=3;
     private final static int doorRange=7;
     private final static double entriesRange=0.7;
+    private final static int[][] rotationTable={{-1,0},{0,1},{1,0},{0,-1}};
+    private final static int minVaultSize=9;
+    private final static int maxVaultSize=60;
+
     private final static  Random random=new Random();
 
     private static int entrySide;
@@ -124,8 +128,9 @@ public class MapTransformation {
             map.setTerrain(c.x, c.y,Place.WALL);
 
             ArrayList<HashMap<String,Coordinate>> coordinates=checkIfBlockingGlobalPassage(c.x,c.y,map);
-            //If not blocking passage
-            if(coordinates==null){
+
+            //If not blocking passage, and have size in interval
+            if(coordinates==null || coordinates.get(1).size()<minVaultSize || coordinates.get(1).size()>maxVaultSize){
                 map.setTerrain(c.x, c.y,Place.FLOOR);
                 possibleLocationForDoor.remove(c);
             }else{
@@ -239,7 +244,6 @@ public class MapTransformation {
         coords.add(c);
         Stack<Integer> rotation=new Stack<>();
         rotation.add(0);
-        int[][] rotationTable={{-1,0},{0,1},{1,0},{0,-1}};
         //Places that are checked if there are connected
         boolean[][] checkedSpace=new boolean[3][3];
         checkedSpace[c.y][c.x]=true;
@@ -281,39 +285,38 @@ public class MapTransformation {
             coordinate1=new Coordinate(x,y-1);
             coordinate2=new Coordinate(x,y+1);
         }
-        HashMap<String,Coordinate> checkedCoordinates1=deepSearchAlgorithm(coordinate1,entry,1,map);
+        HashMap<String,Coordinate> checkedCoordinates1= breadthSearchAlgorithm(coordinate1,entry,1,map);
         //is separable
         if(checkedCoordinates1.containsKey(coordinate2.x+";"+coordinate2.y)){
             return null;
         }
-        HashMap<String,Coordinate> checkedCoordinates2=deepSearchAlgorithm(coordinate2,entry,2,map);
+        HashMap<String,Coordinate> checkedCoordinates2= breadthSearchAlgorithm(coordinate2,entry,2,map);
 
-        if(entrySide==0){
-            return null;
-        }
         //[0]-> is entry, [1] -> is inside;
         ArrayList<HashMap<String,Coordinate>> orderedCoordinates=new ArrayList<>();
-        if(entrySide==1){
+        //entrySide==1
+        if(checkedCoordinates1.containsKey(entry.x+";"+entry.y)){
             orderedCoordinates.add(checkedCoordinates1);
             orderedCoordinates.add(checkedCoordinates2);
-        }else{
+        }
+        //entrySide==2
+        else if (checkedCoordinates2.containsKey(entry.x+";"+entry.y)){
             orderedCoordinates.add(checkedCoordinates2);
             orderedCoordinates.add(checkedCoordinates1);
         }
-
-        if(orderedCoordinates.get(1).size()<9){
-            return  null;
+        //entrySide==0
+        else{
+            return null;
         }
 
         return orderedCoordinates;
     }
 
-    private static HashMap<String,Coordinate> deepSearchAlgorithm(Coordinate start,Coordinate entry,int side,Map map){
+    private static HashMap<String,Coordinate> breadthSearchAlgorithm(Coordinate start, Coordinate entry, int side, Map map){
         HashMap<String,Coordinate> checkedCoordinates=new HashMap<>();
         ArrayList<Coordinate> coordinates;
         ArrayList<Coordinate> nextCoordinates=new ArrayList<>();
         nextCoordinates.add(start);
-        int[][] rotationTable={{-1,0},{0,1},{1,0},{0,-1}};
         do{
             coordinates=nextCoordinates;
             nextCoordinates=new ArrayList<>();
@@ -321,12 +324,8 @@ public class MapTransformation {
                 for(int[] rot:rotationTable){
                     Coordinate coordinate=new Coordinate(c.x+rot[0],c.y+rot[1]);
                     String key=coordinate.x+";"+coordinate.y;
-                    //if checked
-                    if(checkedCoordinates.containsKey(key)){}
-                    //is entry
-                    else if(coordinate.x==entry.x && coordinate.y==entry.y){
-                        entrySide=side;
-                    }else if(map.getTerrain(coordinate.x,coordinate.y)==Place.FLOOR || map.getTerrain(coordinate.x,coordinate.y)==Place.ENEMY){
+                    if(!checkedCoordinates.containsKey(key)
+                            && (map.getTerrain(coordinate.x,coordinate.y)==Place.FLOOR || map.getTerrain(coordinate.x,coordinate.y)==Place.ENEMY || map.getTerrain(coordinate.x,coordinate.y)==Place.ENTRIES || map.getTerrain(coordinate.x,coordinate.y)==Place.KEY)){
                         checkedCoordinates.put(key,coordinate);
                         nextCoordinates.add(coordinate);
                     }

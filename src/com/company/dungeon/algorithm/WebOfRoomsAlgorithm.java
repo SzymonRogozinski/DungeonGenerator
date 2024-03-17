@@ -24,6 +24,7 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     private static final int maxSize=14;
     private static final int minSize=7;
     private static final int roomMargin =1;
+    private static final double additionalCorridorsParam =0.3;
 
     @Override
     public void setStart(int limit, Random random, Map reference, double dense) throws UnexpectedException {
@@ -61,10 +62,30 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
                 roomCenters.put(p,room);
                 centres.add(p);
             }
-            ArrayList<DEdge> corridors=DelaunayTriangulation(centres, reference.getWidth(), reference.getHeight());
-            //Drawing each corridor
-            for(DEdge edge:corridors){
-                drawCorridor(edge);
+            //Making corridors web and MST
+            HashSet<DEdge> allCorridorsHash=DelaunayTriangulation(centres, reference.getWidth(), reference.getHeight());
+            ArrayList<DEdge> allCorridorsList=new ArrayList<>(allCorridorsHash);
+            HashSet<DEdge> mstCorridors=getMinimumSpanningTree(centres,allCorridorsHash);
+            //Additional corridors
+            int additionalCorridorCounter= (int)((allCorridorsHash.size()-mstCorridors.size())* additionalCorridorsParam);
+            HashSet<DEdge> additionalCorridors= new HashSet<>();
+            while(additionalCorridorCounter>0){
+                int r=random.nextInt(allCorridorsList.size());
+                DEdge edge=allCorridorsList.get(r);
+                //Not in MST and in additional corridors list
+                if(!mstCorridors.contains(edge) && !additionalCorridors.contains(edge)){
+                    additionalCorridors.add(edge);
+                    additionalCorridorCounter--;
+                }
+            }
+            //Drawing mst corridors
+            for(DEdge edge:mstCorridors){
+                drawCorridor(edge,true);
+            }
+            reference.makeCopy();
+            //Drawing additional corridors
+            for(DEdge edge:additionalCorridors){
+                drawCorridor(edge,false);
             }
             roomGenerated=true;
             return true;
@@ -94,27 +115,21 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
         return false;
     }
 
-    private ArrayList<DEdge> DelaunayTriangulation(ArrayList<DPoint> rectangleCentres, int maxX, int maxY){
+    private HashSet<DEdge> DelaunayTriangulation(ArrayList<DPoint> rectangleCentres, int maxX, int maxY){
         BowyerWatson bw=new BowyerWatson(maxX,maxY,rectangleCentres);
         HashSet<DEdge> allOfEdges=bw.getPrunEdges();
-        Kruskal kruskal=new Kruskal(rectangleCentres,allOfEdges);
-        HashSet<DEdge> edges=kruskal.getMST();
-
-        int additionalEdges= (int)((allOfEdges.size()-edges.size())*0.25);
-        ArrayList<DEdge> edgeList= new ArrayList<>(allOfEdges);
-        Random random=new Random();
-        while(additionalEdges>0){
-            int r=random.nextInt(allOfEdges.size());
-            DEdge edge=edgeList.get(r);
-            if(!edges.contains(edge)){
-                edges.add(edge);
-                additionalEdges--;
-            }
-        }
-        return new ArrayList<>(edges);
+        return allOfEdges;
     }
 
-    private void drawCorridor(DEdge edge) {
+    private HashSet<DEdge> getMinimumSpanningTree(ArrayList<DPoint> rectangleCentres,HashSet<DEdge> edges){
+        HashSet<DEdge> edgesCopy= (HashSet<DEdge>) edges.clone();
+        Kruskal kruskal=new Kruskal(rectangleCentres,edgesCopy);
+        HashSet<DEdge> edgesMST=kruskal.getMST();
+
+        return edgesMST;
+    }
+
+    private void drawCorridor(DEdge edge,boolean collisionAccepted) {
         DPoint start=edge.p[0];
         DPoint end=edge.p[1];
         //Move point to wall
@@ -166,19 +181,25 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
 
         int dx=endX-startX;
         int dy=endY-startY;
-
-        if(Math.abs(dy)<Math.abs(dx)){
-            if (startX>endX){
-                plotLineLow(endX,endY,startX,startY);
-            }else{
-                plotLineLow(startX,startY,endX,endY);
+        try {
+            if (Math.abs(dy) < Math.abs(dx)) {
+                if (startX > endX) {
+                    plotLineLow(endX, endY, startX, startY,collisionAccepted);
+                } else {
+                    plotLineLow(startX, startY, endX, endY,collisionAccepted);
+                }
+            } else {
+                if (startY > endY) {
+                    plotLineHigh(endX, endY, startX, startY,collisionAccepted);
+                } else {
+                    plotLineHigh(startX, startY, endX, endY,collisionAccepted);
+                }
             }
-        }else{
-            if (startY>endY){
-                plotLineHigh(endX,endY,startX,startY);
-            }else{
-                plotLineHigh(startX,startY,endX,endY);
-            }
+            //Saving changes to copy
+            reference.makeCopy();
+        }catch (Map.AlreadyTrueException e){
+            //if corridors collide, then return to previous state
+            reference.backToCopy();
         }
     }
 
@@ -193,7 +214,7 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     }
 
     //y loop
-    private void plotLineHigh(int startX,int startY,int endX,int endY){
+    private void plotLineHigh(int startX,int startY,int endX,int endY,boolean collisionAccepted) throws Map.AlreadyTrueException{
         int dx=endX-startX;
         int dy=endY-startY;
 
@@ -204,17 +225,25 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
         }
         int D=2*dx-dy;
         int x=startX;
-        int yDir=startY>endY?-1:1;
+        int yDir=1;
 
         for(int y=startY;y!=endY;y+=yDir){
             try {
                 reference.setTerrain(x, y);
-            }catch (Exception ignore){}
+            }catch (Exception e){
+                if(!collisionAccepted){
+                    throw new Map.AlreadyTrueException();
+                }
+            }
             if(D>0){
                 x+=xDir;
                 try {
                     reference.setTerrain(x, y);
-                }catch (Exception ignore){}
+                }catch (Exception e){
+                    if(!collisionAccepted){
+                        throw new Map.AlreadyTrueException();
+                    }
+                }
                 D+=2*(dx-dy);
             }else {
                 D += 2 * dx;
@@ -223,7 +252,8 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
     }
 
     //x loop
-    private void plotLineLow(int startX,int startY,int endX,int endY){
+    private void plotLineLow(int startX,int startY,int endX,int endY,boolean collisionAccepted) throws Map.AlreadyTrueException{
+
         int dx=endX-startX;
         int dy=endY-startY;
 
@@ -234,17 +264,25 @@ public class WebOfRoomsAlgorithm implements GeneratingAlgorithm {
         }
         int D=2*dy-dx;
         int y=startY;
-        int xDir=startX>endX?-1:1;
+        int xDir=1;
 
         for(int x=startX;x!=endX;x+=xDir){
             try {
                 reference.setTerrain(x, y);
-            }catch (Exception ignore){}
+            }catch (Exception e){
+                if(!collisionAccepted){
+                    throw new Map.AlreadyTrueException();
+                }
+            }
             if(D>0){
                 y+=yDir;
                 try {
                     reference.setTerrain(x, y);
-                }catch (Exception ignore){}
+                }catch (Exception e){
+                    if(!collisionAccepted){
+                        throw new Map.AlreadyTrueException();
+                    }
+                }
                 D+=2*(dy-dx);
             }else {
                 D += 2 * dy;
