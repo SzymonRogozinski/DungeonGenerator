@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DungeonGenerator:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DungeonGenerator_jar</output-path>
+    <root id="archive" name="DungeonGenerator.jar">
+      <element id="module-output" name="DungeonGenerator" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/TOOLBOX_Delaunay_Triangulation_JAVA.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
