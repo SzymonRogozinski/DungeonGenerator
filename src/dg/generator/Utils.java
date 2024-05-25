@@ -17,7 +17,8 @@ public class Utils {
             for(int i=0;i<m.getHeight();i++){
                 for(int j=0;j<m.getWidth();j++){
                     switch (m.getTerrain(j,i)){
-                        case null,VOID -> mapGraphics.setColor(Color.BLACK);
+                        case VOID -> mapGraphics.setColor(Color.BLACK);
+                        case null -> mapGraphics.setColor(Color.BLACK);
                         case FLOOR -> mapGraphics.setColor(Color.WHITE);
                         case WALL -> mapGraphics.setColor(Color.GRAY);
                         case ENTRIES -> mapGraphics.setColor(Color.ORANGE);

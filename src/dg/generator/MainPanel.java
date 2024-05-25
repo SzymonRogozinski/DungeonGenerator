@@ -449,7 +449,8 @@ public class MainPanel extends JPanel {
             for(int i=0;i<map.getHeight();i++){
                 for(int j=0;j<map.getWidth();j++){
                     switch (map.getTerrain(j,i)){
-                        case null,VOID -> mapGraphics.setColor(Color.BLACK);
+                        case VOID -> mapGraphics.setColor(Color.BLACK);
+                        case null -> mapGraphics.setColor(Color.BLACK);
                         case FLOOR -> mapGraphics.setColor(Color.WHITE);
                         case WALL -> mapGraphics.setColor(Color.GRAY);
                         case ENTRIES -> mapGraphics.setColor(Color.ORANGE);
