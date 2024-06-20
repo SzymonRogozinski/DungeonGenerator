@@ -93,7 +93,8 @@ public class MainPanel extends JPanel {
 
     public synchronized void restart(JButton stopButton,JButton nextButton,JButton startButton,JButton restartButton){
         state.stop();
-        genereate.stop();
+        if(state.isWorking())
+            genereate.stop();
 
         this.map=null;
         resetScreen();
@@ -215,6 +216,9 @@ public class MainPanel extends JPanel {
             working=true;
         }
 
+        public boolean isWorking() {
+            return working;
+        }
 
         public void GenerateEnd(){
             working=false;
