@@ -42,3 +42,5 @@ Icons used in the project are from https://game-icons.net/.
   - Open chest icon was created by Skoll.
   - Wooden door icon was created by Lorc.
 
+## Used modules
+Program use module [TOOLBOX_Delaunay_Triangulation_JAVA](https://github.com/wuga214/TOOLBOX_Delaunay_Triangulation_JAVA).
