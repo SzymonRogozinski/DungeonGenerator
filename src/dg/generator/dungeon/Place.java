@@ -9,4 +9,6 @@ public enum Place {
     ENEMY,
     DOOR,
     KEY,
+    SAFE_ROOM_DOORS,
+    NPC
 }

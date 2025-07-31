@@ -6,6 +6,7 @@ public class MapTransformation {
 
     private final static int margin=3;
     private final static int trials=3;
+    private final static int safeRoomTrials=30;
     private final static int doorRange=7;
     private final static double entriesRange=0.7;
     private final static int[][] rotationTable={{-1,0},{0,1},{1,0},{0,-1}};
@@ -101,10 +102,10 @@ public class MapTransformation {
         }
         if(possibleLocation.size()<EnemiesCount)
             throw new Exception("Cannot generate that many enemies!");
-        while(EnemiesCount>0 && possibleLocation.size()>0){
+        while(EnemiesCount>0 && !possibleLocation.isEmpty()){
             int i=random.nextInt(possibleLocation.size());
             Coordinate coordinate=possibleLocation.get(i);
-            if(canBeEnemyLocation(coordinate.x,coordinate.y,entries)) {
+            if(canBeEnemyLocation(coordinate.x,coordinate.y,entries) && (map.getSafeRoom()!=null && !map.getSafeRoom().safeRoomPlaces.contains(coordinate))) {
                 map.setTerrain(coordinate.x,coordinate.y,Place.ENEMY);
                 EnemiesCount--;
             }
@@ -151,6 +152,56 @@ public class MapTransformation {
         }
     }
 
+    public static void drawSafeRoom(Map map, boolean makeSecondFilter){
+        //Create a safe room by blocking certain passage
+        //It must be done, after resize
+
+        //Get blocking places
+        HashSet<Coordinate> blockingLocation = new HashSet<>();
+        for(int y=margin-1;y<map.getHeight()-margin;y++){
+            for(int x=margin-1;x<map.getWidth()-margin;x++){
+                if((map.getTerrain(x,y)==Place.FLOOR) && !checkIfNotBlockingNearbyPassage(x,y,map)) {
+                    blockingLocation.add(new Coordinate(x, y));
+                }
+            }
+        }
+        //Filter bloking places that only enter/exit point exist
+        //First filter
+        HashSet<Coordinate> filteredBlockingLocation = new HashSet<>();
+        for(Coordinate c: blockingLocation){
+            if(!checkBlockingNeighbourhood(c,blockingLocation))
+                filteredBlockingLocation.add(c);
+        }
+
+        if(makeSecondFilter) {
+            for (Coordinate c : filteredBlockingLocation) {
+                blockingLocation.remove(c);
+            }
+            //Second filter
+            filteredBlockingLocation = new HashSet<>();
+            for (Coordinate c : blockingLocation) {
+                if (!checkBlockingNeighbourhood(c, blockingLocation))
+                    filteredBlockingLocation.add(c);
+            }
+        }
+
+        //Find safe room
+        int iterator=0;
+        SafeRoom safeRoom=null;
+        while(safeRoom==null && iterator<safeRoomTrials) {
+            iterator++;
+            safeRoom=findSafeRoom(map, filteredBlockingLocation);
+        }
+
+        //Set Blocking places
+        map.setSafeRoom(safeRoom);
+        if(safeRoom==null)
+            return;
+        for(Coordinate c: safeRoom.safeRoomDoors)
+            map.setTerrain(c.x,c.y,Place.SAFE_ROOM_DOORS);
+        map.setTerrain(safeRoom.npc.x,safeRoom.npc.y,Place.NPC);
+    }
+
     private static void drawKeyAndTreasure(HashMap<String,Coordinate> entrySideCoordinates,HashMap<String,Coordinate> insideCoordinates,Map map) throws Exception {
         int keyCount=1;
         int treasureCount=3;
@@ -176,7 +227,6 @@ public class MapTransformation {
             treasureCoordinates.remove(c);
         }
     }
-
 
     //Check if distance to door is longer than see range
     private static boolean canBeEnemyLocation(int x,int y, ArrayList<Coordinate> entries){
@@ -216,9 +266,8 @@ public class MapTransformation {
     }
 
     private static boolean checkIfNotBlockingNearbyPassage(int x, int y, Map map){
-        if(checkNeighbourhood(x,y,map)){
+        if(checkNeighbourhood(x,y,map))
             return false;
-        }
         //Maps neighbours
         boolean[][] freeSpace={
                 {map.getTerrain(x-1,y-1)==Place.FLOOR,map.getTerrain(x,y-1)==Place.FLOOR,map.getTerrain(x+1,y-1)==Place.FLOOR},
@@ -237,6 +286,9 @@ public class MapTransformation {
                 }
             }
         }
+
+        if(freeSpaceCount == 1 || freeSpaceCount>=7)
+            return true;
 
         if(c==null)
             return false;
@@ -271,6 +323,60 @@ public class MapTransformation {
         }
         //Check if all spaces are achievable
         return freeSpaceCount==counter;
+    }
+
+    private static SafeRoom findSafeRoom(Map map, HashSet<Coordinate> possibleDoors){
+        //Set start
+        SafeRoom safeRoom=new SafeRoom();
+
+        Coordinate startDoor = (Coordinate) possibleDoors.toArray()[random.nextInt(possibleDoors.size())];
+        Coordinate startFloor = null;
+        while (startFloor==null){
+            int[] rotation = rotationTable[random.nextInt(rotationTable.length)];
+            if( map.getTerrain(startDoor.x+rotation[1],startDoor.y+rotation[0])==Place.FLOOR)
+                startFloor = new Coordinate(startDoor.x+rotation[1],startDoor.y+rotation[0]);
+        }
+
+        //Stack
+        Stack<Coordinate> places = new Stack<>();
+        Stack<Coordinate> nextPlaces = new Stack<>();
+
+        safeRoom.safeRoomPlaces.add(startFloor);
+        places.add(startFloor);
+
+        //BSA
+        while(!places.isEmpty() && safeRoom.safeRoomPlaces.size()<=maxVaultSize){
+            Coordinate check=places.pop();
+
+            for(int[] rotation:rotationTable){
+                Coordinate c = new Coordinate(check.x+rotation[1], check.y+rotation[0]);
+                if(map.getTerrain(c.x,c.y)!=Place.FLOOR || safeRoom.safeRoomPlaces.contains(c)){
+                }else if(!possibleDoors.contains(c)){
+                    safeRoom.safeRoomPlaces.add(c);
+                    nextPlaces.add(c);
+                }else
+                    safeRoom.safeRoomDoors.add(c);
+            }
+
+            if(places.isEmpty()){
+                places=nextPlaces;
+                nextPlaces=new Stack<>();
+            }
+        }
+
+        //Can NPC spawn?
+        for(Coordinate c : safeRoom.safeRoomPlaces){
+            if(checkIfNotBlockingNearbyPassage(c.x,c.y,map)){
+                safeRoom.npc=c;
+                break;
+            }
+        }
+
+        //Is safe room correct?
+        if(safeRoom.npc!=null && places.isEmpty() && safeRoom.safeRoomPlaces.size()>=minVaultSize && safeRoom.safeRoomPlaces.size()<=maxVaultSize){
+            return safeRoom;
+        }
+        return null;
     }
 
     private static ArrayList<HashMap<String,Coordinate>> checkIfBlockingGlobalPassage(int x, int y, Map map){
@@ -341,5 +447,15 @@ public class MapTransformation {
             if(map.getTerrain(x+mod[1],y+mod[0])!=Place.FLOOR && map.getTerrain(x+mod[1],y+mod[0])!=Place.WALL && map.getTerrain(x+mod[1],y+mod[0])!=Place.VOID)
                 return true;
         return false;
+    }
+
+    private static boolean checkBlockingNeighbourhood(Coordinate c, HashSet<Coordinate> blocking){
+        //Check if something is in neighbourhood
+        int[][] positionToCheck={{-1,0},{0,-1},{0,1},{1,0}};
+        int count=0;
+        for(int[] mod:positionToCheck)
+            if(blocking.contains(new Coordinate(c.x+mod[1],c.y+mod[0])))
+                count++;
+        return count>1;
     }
 }
