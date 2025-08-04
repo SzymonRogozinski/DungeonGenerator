@@ -105,7 +105,7 @@ public class MapTransformation {
         while(EnemiesCount>0 && !possibleLocation.isEmpty()){
             int i=random.nextInt(possibleLocation.size());
             Coordinate coordinate=possibleLocation.get(i);
-            if(canBeEnemyLocation(coordinate.x,coordinate.y,entries) && (map.getSafeRoom()!=null && !map.getSafeRoom().safeRoomPlaces.contains(coordinate))) {
+            if(canBeEnemyLocation(coordinate.x,coordinate.y,entries) && (map.getSafeRoom()==null || !map.getSafeRoom().safeRoomPlaces.contains(coordinate))) {
                 map.setTerrain(coordinate.x,coordinate.y,Place.ENEMY);
                 EnemiesCount--;
             }

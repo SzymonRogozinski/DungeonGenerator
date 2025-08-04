@@ -200,12 +200,11 @@ public class MainPanel extends JPanel {
     }
 
     public synchronized void drawRoom(){
-        try {
-            MapTransformation.drawSafeRoom(map, algorithmType==3);
-        }catch (Exception e){
-            System.err.println(e.getMessage());
+        if(state.isBordered()) {
+            MapTransformation.drawSafeRoom(map, algorithmType == 3);
+
+            resetScreen();
         }
-        resetScreen();
     }
 
     public synchronized void algorithmEnded(){
@@ -369,7 +368,7 @@ public class MainPanel extends JPanel {
             doors.setBounds(2*buttonSize+buttonShift,3*buttonSize+buttonShift,buttonSize,buttonSize);
             doors.addActionListener(e->drawDoor());
 
-            rooms = new JButton("R");
+            rooms = new JButton(new ImageIcon("Menu_Buttons/shop.png"));
             rooms.setEnabled(true);
             rooms.setBounds(2*buttonSize+buttonShift,4*buttonSize+buttonShift,buttonSize,buttonSize);
             rooms.addActionListener(e->drawRoom());

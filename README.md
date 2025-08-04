@@ -1,9 +1,9 @@
 It's a program write in java, that generates dungeon structures.
-It have three generating algorithm, can save dungeon as an image and user can observe or speed up dungeon generation.
+It has three generating algorithm, can save dungeon as an image and user can observe or speed up dungeon generation.
 
 Inputs:
   - Size of map - Height and width of dungeon.
-  - Size of dungeon - Number of sqares, that dungeon should at least have.
+  - Size of dungeon - Number of squares, that dungeon should at least have.
   - Seed - Seed of random generation.
   - Dungeon algorithm - Type of algorithm that will be used to generate dungeon.
 
@@ -21,6 +21,7 @@ Buttons (Reading from right up corner):
   - Drew treasures - Drew few treasures.
   - Drew enemies - Drew few enemies.
   - Drew doors and keys - Drew few doors and keys.
+  - Drew safe room - Drew room safe from enemies and with friendly NPC
 
 Colours:
   - Black - Outside of dungeon.
@@ -31,3 +32,7 @@ Colours:
   - Blue - Treasures.
   - Yellow - Doors. (Blocking passage inside dungeon)
   - Cyan - Keys.
+  - Green - Safe room doors.
+  - Magenta - Friendly NPC.
+
+Used graphics from game https://game-icons.net/.
