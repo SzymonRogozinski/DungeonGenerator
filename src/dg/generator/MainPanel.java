@@ -121,7 +121,7 @@ public class MainPanel extends JPanel {
             try {
                 //Rescale
                 Image tmp = map.getImage().getScaledInstance(Main.DRAW_SIZE, Main.DRAW_SIZE, Image.SCALE_SMOOTH);
-                BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_BYTE_BINARY);
+                BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_INT_RGB);
                 Graphics2D g2d = dimg.createGraphics();
                 g2d.drawImage(tmp, 0, 0, null);
                 g2d.dispose();
@@ -195,6 +195,14 @@ public class MainPanel extends JPanel {
                 System.err.println(e.getMessage());
             }
             state.borderDrew();
+            resetScreen();
+        }
+    }
+
+    public synchronized void drawRoom(){
+        if(state.isBordered()) {
+            MapTransformation.drawSafeRoom(map, algorithmType == 3);
+
             resetScreen();
         }
     }
@@ -278,7 +286,7 @@ public class MainPanel extends JPanel {
 
     private class ControlPanel extends JPanel {
 
-        private final JButton start,stop,next,restart,save,speedUp,resize,border,entries,treasure,enemies,doors;
+        private final JButton start,stop,next,restart,save,speedUp,resize,border,entries,treasure,enemies,doors,rooms;
         private final JRadioButton firstAlg,secondAlg,thirdAlg;
         private final ButtonGroup algorithmChose;
         private final JTextField size_of_map,numberOfElements,seed;
@@ -360,6 +368,11 @@ public class MainPanel extends JPanel {
             doors.setBounds(2*buttonSize+buttonShift,3*buttonSize+buttonShift,buttonSize,buttonSize);
             doors.addActionListener(e->drawDoor());
 
+            rooms = new JButton(new ImageIcon("Menu_Buttons/shop.png"));
+            rooms.setEnabled(true);
+            rooms.setBounds(2*buttonSize+buttonShift,4*buttonSize+buttonShift,buttonSize,buttonSize);
+            rooms.addActionListener(e->drawRoom());
+
             //Radio Buttons
             firstAlg=new JRadioButton("Cave");
             firstAlg.setBounds(buttonShift,4*buttonSize+buttonShift,radioButtonWidth,radioButtonHeight);
@@ -379,14 +392,13 @@ public class MainPanel extends JPanel {
             algorithmChose.add(secondAlg);
             algorithmChose.add(thirdAlg);
 
-
             textOfSize=new JLabel("Size of map");
             textOfSize.setBounds(textfieldShift,(int)(6.5*textfieldSpacing),textfieldWidth,textfieldHeight);
             textOfSize.setHorizontalAlignment(JLabel.CENTER);
             textOfSize.setForeground(Color.WHITE);
 
             size_of_map =new JTextField("100");
-            size_of_map.setBounds(textfieldShift,(int)7*textfieldSpacing,textfieldWidth,textfieldHeight);
+            size_of_map.setBounds(textfieldShift,7*textfieldSpacing,textfieldWidth,textfieldHeight);
             size_of_map.setHorizontalAlignment(JTextField.CENTER);
 
             textOfNumber=new JLabel("Size of dungeon");
@@ -419,6 +431,7 @@ public class MainPanel extends JPanel {
             this.add(treasure);
             this.add(enemies);
             this.add(doors);
+            this.add(rooms);
             this.add(firstAlg);
             this.add(secondAlg);
             this.add(thirdAlg);
@@ -462,6 +475,8 @@ public class MainPanel extends JPanel {
                         case ENEMY -> mapGraphics.setColor(Color.RED);
                         case KEY -> mapGraphics.setColor(Color.cyan);
                         case DOOR -> mapGraphics.setColor(Color.YELLOW);
+                        case SAFE_ROOM_DOORS -> mapGraphics.setColor(Color.GREEN);
+                        case NPC -> mapGraphics.setColor(Color.MAGENTA);
                     }
                     mapGraphics.fillRect(j, i, 1, 1);
                 }

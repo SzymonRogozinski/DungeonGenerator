@@ -11,7 +11,7 @@ public class Utils {
 
     public static void main(String[] args) {
         try {
-            Map m = Generator.generateDungeon(Generator.CAVE_ALGORITHM, 100, 100, 3000, 30, 30, 3);
+            Map m = Generator.generateDungeon(Generator.CAVE_ALGORITHM, 100, 100, 3000, 30, 30, 3,2);
             Graphics2D mapGraphics=m.getImage().createGraphics();
             //Drawing
             for(int i=0;i<m.getHeight();i++){
@@ -26,13 +26,15 @@ public class Utils {
                         case ENEMY -> mapGraphics.setColor(Color.RED);
                         case KEY -> mapGraphics.setColor(Color.cyan);
                         case DOOR -> mapGraphics.setColor(Color.YELLOW);
+                        case SAFE_ROOM_DOORS -> mapGraphics.setColor(Color.GREEN);
+                        case NPC -> mapGraphics.setColor(Color.MAGENTA);
                     }
                     mapGraphics.fillRect(j, i, 1, 1);
                 }
             }
             mapGraphics.dispose();
             Image tmp = m.getImage().getScaledInstance(Main.DRAW_SIZE, Main.DRAW_SIZE, Image.SCALE_SMOOTH);
-            BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_BYTE_BINARY);
+            BufferedImage dimg = new BufferedImage(Main.DRAW_SIZE, Main.DRAW_SIZE, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = dimg.createGraphics();
             g2d.drawImage(tmp, 0, 0, null);
             g2d.dispose();

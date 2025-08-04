@@ -23,6 +23,8 @@ It has three generating algorithms, can save the dungeon as an image, and allows
   - Draw treasures - Draw a few treasures.
   - Draw enemies - Draw a few enemies.
   - Draw doors and keys - Draw a few doors and keys.
+  - Drew safe room - Drew room safe from enemies and with friendly NPC
+
 
 ## Colors
   - Black - Outside of the dungeon.
@@ -33,10 +35,12 @@ It has three generating algorithms, can save the dungeon as an image, and allows
   - Blue - Treasures.
   - Yellow - Doors (Blocking passage inside the dungeon).
   - Cyan - Keys.
+  - Green - Safe room doors.
+  - Magenta - Friendly NPC.
 
 ## Graphics
 Icons used in the project are from https://game-icons.net/.
-  - Bully minion icon, Clockwise rotation icon, Contract icon, Fast forward button icon, Highlighter icon, Next button icon, Save icon were created by Delapouite.
+  - Bully minion icon, Clockwise rotation icon, Contract icon, Fast forward button icon, Highlighter icon, Next button icon, Save icon, Shop icon were created by Delapouite.
   - Key icon was created by sbed.
   - Pause button icon, Play button icon were created by Guard13007.
   - Open chest icon was created by Skoll.

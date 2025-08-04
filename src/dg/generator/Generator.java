@@ -19,7 +19,7 @@ public class Generator {
     private static Random random=new Random();
     private static double dense= DEFAULT_DENSE;
 
-    public static Map generateDungeon(int selectedAlgorithm,int width,int height,int size,int enemies, int treasures, int vaults) throws UnexpectedException {
+    public static Map generateDungeon(int selectedAlgorithm,int width,int height,int size,int enemies, int treasures, int vaults, int safeRooms) throws UnexpectedException {
         GeneratingAlgorithm genAlg;
         switch(selectedAlgorithm){
             case CAVE_ALGORITHM -> genAlg=new SimpleAntAlgorithm();
@@ -41,6 +41,8 @@ public class Generator {
         map.resize(limits[0],limits[1],limits[2],limits[3]);
         MapTransformation.setRandom(random);
         MapTransformation.drawBorder(map);
+        for(int i=0;i<safeRooms;i++)
+            MapTransformation.drawSafeRoom(map,selectedAlgorithm==DUNGEON_ALGORITHM);
         MapTransformation.drawEntries(map);
         for(int i=0;i<vaults;i++)
             MapTransformation.drawDoorAndKey(map);

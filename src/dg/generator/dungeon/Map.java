@@ -10,7 +10,7 @@ public class Map {
     //[0]->Enter, [1]->Exit
     private Coordinate[] entries;
     private BufferedImage image;
-
+    private SafeRoom safeRoom;
     private final static int margin=3;
 
     public Map(int width, int height) {
@@ -22,6 +22,14 @@ public class Map {
             Arrays.fill(places,Place.VOID);
         }
         image=new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
+    }
+
+    public SafeRoom getSafeRoom() {
+        return safeRoom;
+    }
+
+    public void setSafeRoom(SafeRoom safeRoom) {
+        this.safeRoom = safeRoom;
     }
 
     public int getHeight() {
@@ -90,10 +98,21 @@ public class Map {
         for (int i=0;i< newTerrain.length;i++) {
             System.arraycopy(terrain[i],minX,newTerrain[i],xMargin,xLen);
         }
+
         //Saving changes
         terrain=newTerrain;
         width=xLen+2*xMargin;
         height=yLen+2*yMargin;
+
+        //Removing nulls
+        for(int y=0; y<height;y++){
+            for(int x=0; x<width;x++){
+                if(terrain[y][x]==null)
+                    terrain[y][x]=Place.VOID;
+            }
+        }
+
+        //Draw new image
         image=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
     }
 
