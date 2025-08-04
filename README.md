@@ -1,38 +1,50 @@
-It's a program write in java, that generates dungeon structures.
-It has three generating algorithm, can save dungeon as an image and user can observe or speed up dungeon generation.
+# Dungeon Generator
 
-Inputs:
-  - Size of map - Height and width of dungeon.
-  - Size of dungeon - Number of squares, that dungeon should at least have.
-  - Seed - Seed of random generation.
-  - Dungeon algorithm - Type of algorithm that will be used to generate dungeon.
+It's a program written in Java that generates dungeon structures.
+It has three generating algorithms, can save the dungeon as an image, and allows the user to observe or speed up the dungeon generation.
 
-Buttons (Reading from right up corner):
+## Inputs
+  - Size of map - Height and width of the dungeon.
+  - Size of dungeon - Number of squares that the dungeon should at least have.
+  - Seed - Seed for random generation.
+  - Dungeon algorithm - Type of algorithm that will be used to generate the dungeon.
+
+## Buttons (Reading from the top right corner)
 
   - Start - Start generating.
   - Stop - Stop generating.
-  - Next - Make next step, if stopped.
-  - Reset - Clear screen of previous dungeon.
-  - Save - Save dungeon as image.
-  - Speed up - Skip generating process to end.
-  - Resize - Centre and zoom in dungeon.
-  - Drew walls - Drew walls of dungeon.
-  - Drew entries - Drew entries to dungeon.
-  - Drew treasures - Drew few treasures.
-  - Drew enemies - Drew few enemies.
-  - Drew doors and keys - Drew few doors and keys.
+  - Next - Make the next step if stopped.
+  - Reset - Clear the screen of the previous dungeon.
+  - Save - Save the dungeon as an image.
+  - Speed up - Skip the generating process to the end.
+  - Resize - Center and zoom in the dungeon.
+  - Draw walls - Draw the walls of the dungeon.
+  - Draw entries - Draw entries to the dungeon.
+  - Draw treasures - Draw a few treasures.
+  - Draw enemies - Draw a few enemies.
+  - Draw doors and keys - Draw a few doors and keys.
   - Drew safe room - Drew room safe from enemies and with friendly NPC
 
-Colours:
-  - Black - Outside of dungeon.
+
+## Colors
+  - Black - Outside of the dungeon.
   - White - Floors.
   - Gray - Walls.
   - Red - Enemies.
-  - Orange - Entries. (Entry and exit)
+  - Orange - Entries (Entry and exit).
   - Blue - Treasures.
-  - Yellow - Doors. (Blocking passage inside dungeon)
+  - Yellow - Doors (Blocking passage inside the dungeon).
   - Cyan - Keys.
   - Green - Safe room doors.
   - Magenta - Friendly NPC.
 
-Used graphics from game https://game-icons.net/.
+## Graphics
+Icons used in the project are from https://game-icons.net/.
+  - Bully minion icon, Clockwise rotation icon, Contract icon, Fast forward button icon, Highlighter icon, Next button icon, Save icon, Shop icon were created by Delapouite.
+  - Key icon was created by sbed.
+  - Pause button icon, Play button icon were created by Guard13007.
+  - Open chest icon was created by Skoll.
+  - Wooden door icon was created by Lorc.
+
+## Used modules
+Program use module [TOOLBOX_Delaunay_Triangulation_JAVA](https://github.com/wuga214/TOOLBOX_Delaunay_Triangulation_JAVA).
